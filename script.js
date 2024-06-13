@@ -1,10 +1,10 @@
 const game = document.getElementById('game');
 const player1 = document.getElementById('player1');
 const player2 = document.getElementById('player2');
-const health1 = document.getElementById('health1');
-const health2 = document.getElementById('health2');
-const ultimate1 = document.getElementById('ultimate1');
-const ultimate2 = document.getElementById('ultimate2');
+const health1 = document.getElementById('health1').querySelector('.health');
+const health2 = document.getElementById('health2').querySelector('.health');
+const ultimate1 = document.getElementById('ultimate1').querySelector('.ultimate');
+const ultimate2 = document.getElementById('ultimate2').querySelector('.ultimate');
 
 let player1Health = 10;
 let player2Health = 10;
@@ -13,11 +13,12 @@ let player2Ultimate = 0;
 let player1Paralyzed = false;
 let player1UltimateActive = false;
 let player2UltimateActive = false;
+let backgroundColorChanged = false;
 
 const playerSpeed = 10;
 const ultimateChargeSpeed = 100;
 const ultimateFullCharge = 100;
-const paralysisDuration = 3000;  // 3 seconds
+const paralysisDuration = 6000;  // 3 seconds
 
 document.addEventListener('keydown', (event) => {
     if (player1Paralyzed && ['w', 'a', 's', 'd'].includes(event.key)) return;
@@ -59,7 +60,7 @@ document.addEventListener('keydown', (event) => {
             break;
         case 'm':
             if (player2UltimateActive) {
-                launchUltimateBall(player2, 'left');
+                launchUltimateRectangle(player2, 'left');
             } else {
                 shootBall(player2, 'left', false);
             }
@@ -85,6 +86,21 @@ document.addEventListener('keydown', (event) => {
             break;
         case ',':
             meleeAttack(player2, player1, false);
+            break;
+        // Habilidade especial de mudança de fundo
+        case 't':
+            if (!backgroundColorChanged && player1UltimateActive) {
+                changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png');
+                dealGuaranteedDamage(player2, 5);
+                player1UltimateActive = false;
+            }
+            break;
+        case 'b':
+            if (!backgroundColorChanged && player2UltimateActive) {
+                changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg');
+                paralyzePlayer(player1, paralysisDuration);
+                player2UltimateActive = false;
+            }
             break;
     }
 });
@@ -161,46 +177,19 @@ function launchUltimateRectangle(player, direction) {
 
         let moveInterval = setInterval(() => {
             let currentLeft = parseInt(rect.style.left);
-            rect.style.left = currentLeft + 5 + 'px';
+            rect.style.left = direction === 'right' ? currentLeft + 5 + 'px' : currentLeft - 5 + 'px';
 
-            // Checar colisão com parede ou player2
-            if (currentLeft > gameRect.width) {
+            // Checar colisão com parede ou outro jogador
+            if (currentLeft > gameRect.width || currentLeft < 0) {
                 clearInterval(moveInterval);
                 rect.remove();
-                player1UltimateActive = false;
+                if (player === player1) player1UltimateActive = false;
+                if (player === player2) player2UltimateActive = false;
             } else {
                 checkCollision(rect, player1, player2, true);
-                if (player2UltimateActive) {
-                    clearInterval(moveInterval);
-                    rect.remove();
-                    player1UltimateActive = false;
-                }
             }
         }, 20);
-
     }, 500);
-}
-
-function launchUltimateBall(player, direction) {
-    const ball = document.createElement('div');
-    ball.classList.add('ball', 'purple', 'ultimate');
-    game.appendChild(ball);
-
-    const playerRect = player.getBoundingClientRect();
-    const gameRect = game.getBoundingClientRect();
-
-    if (direction === 'right') {
-        ball.style.left = playerRect.right - gameRect.left + 'px';
-    } else {
-        ball.style.left = playerRect.left - gameRect.left - 10 + 'px';
-    }
-    ball.style.top = playerRect.top - gameRect.top + (playerRect.height / 2 - 5) + 'px';
-
-    setTimeout(() => {
-        checkCollision(ball, player1, player2, true);
-        ball.remove();
-        player2UltimateActive = false;
-    }, 1000);
 }
 
 function checkCollision(ball, player1, player2, isUltimate) {
@@ -250,11 +239,33 @@ function chargeUltimate() {
     }
 }
 
-function activateUltimate2() {
-    player1Paralyzed = true;
+function paralyzePlayer(player, duration) {
+    if (player === player1) {
+        player1Paralyzed = true;
+        setTimeout(() => {
+            player1Paralyzed = false;
+        }, duration);
+    }
+}
+
+function dealGuaranteedDamage(player, damage) {
+    if (player === player2) {
+        player2Health -= damage;
+        updateHealth(health2, player2Health);
+    }
+}
+
+function changeBackgroundImage(imageUrl) {
+    if (backgroundColorChanged) return;
+
+    let originalBackgroundImage = window.getComputedStyle(game).backgroundImage;
+    game.style.backgroundImage = `url(${imageUrl})`;
+    backgroundColorChanged = true;
+
     setTimeout(() => {
-        player1Paralyzed = false;
-    }, paralysisDuration);
+        game.style.backgroundImage = originalBackgroundImage;
+        backgroundColorChanged = false;
+    }, 5000);
 }
 
 function meleeAttack(attacker, defender, isUltimate) {
@@ -262,11 +273,11 @@ function meleeAttack(attacker, defender, isUltimate) {
     const defenderRect = defender.getBoundingClientRect();
 
     if (isColliding(attackerRect, defenderRect)) {
-        const damage = isUltimate ? 5 : 2;
-        if (attacker === player1) {
-            updateHealth(health2, player2Health -= damage);
-        } else {
+        const damage = isUltimate ? 2 : 1;
+        if (defender === player1) {
             updateHealth(health1, player1Health -= damage);
+        } else {
+            updateHealth(health2, player2Health -= damage);
         }
     }
 }
@@ -274,17 +285,20 @@ function meleeAttack(attacker, defender, isUltimate) {
 function resetGame() {
     player1Health = 10;
     player2Health = 10;
-    health1.style.width = '100%';
-    health2.style.width = '100%';
     player1Ultimate = 0;
     player2Ultimate = 0;
-    ultimate1.style.width = '0%';
-    ultimate2.style.width = '0%';
-    player1.style.left = '50px';
-    player1.style.bottom = '50px';
-    player2.style.right = '50px';
-    player2.style.bottom = '50px';
+    player1Paralyzed = false;
+    player1UltimateActive = false;
+    player2UltimateActive = false;
+    backgroundColorChanged = false;
+    updateHealth(health1, player1Health);
+    updateHealth(health2, player2Health);
+    updateUltimate(ultimate1, player1Ultimate);
+    updateUltimate(ultimate2, player2Ultimate);
+    player1.style.left = '100px';
+    player1.style.top = '100px';
+    player2.style.right = '100px';
+    player2.style.top = '100px';
 }
 
-// Carregar a barra de ultimate a cada segundo
 setInterval(chargeUltimate, 1000);
