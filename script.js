@@ -15,7 +15,7 @@ let player1UltimateActive = false;
 let player2UltimateActive = false;
 
 const playerSpeed = 10;
-const ultimateChargeSpeed = 1;
+const ultimateChargeSpeed = 100;
 const ultimateFullCharge = 100;
 const paralysisDuration = 3000;  // 3 seconds
 
@@ -155,15 +155,30 @@ function launchUltimateRectangle(player, direction) {
     rect.style.top = playerRect.top - gameRect.top + 'px';
 
     setTimeout(() => {
+        rect.style.transition = 'width 0.5s ease-out, height 0.5s ease-out';
         rect.style.width = '50px';
         rect.style.height = '50px';
-        checkCollision(rect, player1, player2, true);
-    }, 500);
 
-    setTimeout(() => {
-        rect.remove();
-        player1UltimateActive = false;
-    }, 1000);
+        let moveInterval = setInterval(() => {
+            let currentLeft = parseInt(rect.style.left);
+            rect.style.left = currentLeft + 5 + 'px';
+
+            // Checar colisão com parede ou player2
+            if (currentLeft > gameRect.width) {
+                clearInterval(moveInterval);
+                rect.remove();
+                player1UltimateActive = false;
+            } else {
+                checkCollision(rect, player1, player2, true);
+                if (player2UltimateActive) {
+                    clearInterval(moveInterval);
+                    rect.remove();
+                    player1UltimateActive = false;
+                }
+            }
+        }, 20);
+
+    }, 500);
 }
 
 function launchUltimateBall(player, direction) {
