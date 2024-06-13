@@ -1,0 +1,81 @@
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+#game {
+    position: relative;
+    width: 800px;
+    height: 400px;
+    background-color: #fff;
+    border: 2px solid #000;
+}
+
+.player {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
+#player1 {
+    background-color: red;
+    left: 50px;
+    bottom: 50px;
+}
+
+#player2 {
+    background-color: blue;
+    right: 50px;
+    bottom: 50px;
+}
+
+.ball {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+}
+
+.ball.ultimate {
+    background-color: red;
+}
+
+.rect.ultimate {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+}
+
+.ball.purple {
+    background-color: purple;
+}
+
+.health-bar, .ultimate-bar {
+    position: absolute;
+    width: 100%;
+    height: 10px;
+    background-color: gray;
+}
+
+.health-bar {
+    bottom: 60px;
+}
+
+.ultimate-bar {
+    bottom: 75px;
+}
+
+.health, .ultimate {
+    height: 100%;
+    background-color: green;
+}
+
+.ultimate {
+    background-color: orange;
+}
