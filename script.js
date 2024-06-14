@@ -2,7 +2,9 @@ const game = document.getElementById('game');
 const player1 = document.getElementById('player1');
 const player2 = document.getElementById('player2');
 const health1 = document.getElementById('health1').querySelector('.health');
+const lostHealth1 = document.getElementById('health1').querySelector('.lost-health');
 const health2 = document.getElementById('health2').querySelector('.health');
+const lostHealth2 = document.getElementById('health2').querySelector('.lost-health');
 const ultimate1 = document.getElementById('ultimate1').querySelector('.ultimate');
 const ultimate2 = document.getElementById('ultimate2').querySelector('.ultimate');
 
@@ -18,7 +20,7 @@ let backgroundColorChanged = false;
 const playerSpeed = 10;
 const ultimateChargeSpeed = 100;
 const ultimateFullCharge = 100;
-const paralysisDuration = 6000;  // 3 seconds
+const paralysisDuration = 6000;  // 6 seconds
 
 document.addEventListener('keydown', (event) => {
     if (player1Paralyzed && ['w', 'a', 's', 'd'].includes(event.key)) return;
@@ -199,11 +201,13 @@ function checkCollision(ball, player1, player2, isUltimate) {
 
     if (isColliding(ballRect, player1Rect)) {
         const damage = isUltimate ? 5 : 1;
-        updateHealth(health1, player1Health -= damage);
+        player1Health -= damage;
+        updateHealth(health1, lostHealth1, player1Health);
         ball.remove();
     } else if (isColliding(ballRect, player2Rect)) {
         const damage = isUltimate ? 7 : 1;
-        updateHealth(health2, player2Health -= damage);
+        player2Health -= damage;
+        updateHealth(health2, lostHealth2, player2Health);
         ball.remove();
     }
 }
@@ -215,8 +219,9 @@ function isColliding(rect1, rect2) {
              rect1.top > rect2.bottom);
 }
 
-function updateHealth(healthElement, health) {
+function updateHealth(healthElement, lostHealthElement, health) {
     healthElement.style.width = (health * 10) + '%';
+    lostHealthElement.style.width = ((10 - health) * 10) + '%';
     if (health <= 0) {
         alert('Game Over');
         // Reiniciar o jogo
@@ -251,7 +256,7 @@ function paralyzePlayer(player, duration) {
 function dealGuaranteedDamage(player, damage) {
     if (player === player2) {
         player2Health -= damage;
-        updateHealth(health2, player2Health);
+        updateHealth(health2, lostHealth2, player2Health);
     }
 }
 
@@ -275,9 +280,9 @@ function meleeAttack(attacker, defender, isUltimate) {
     if (isColliding(attackerRect, defenderRect)) {
         const damage = isUltimate ? 2 : 1;
         if (defender === player1) {
-            updateHealth(health1, player1Health -= damage);
+            updateHealth(health1, lostHealth1, player1Health -= damage);
         } else {
-            updateHealth(health2, player2Health -= damage);
+            updateHealth(health2, lostHealth2, player2Health -= damage);
         }
     }
 }
@@ -291,13 +296,13 @@ function resetGame() {
     player1UltimateActive = false;
     player2UltimateActive = false;
     backgroundColorChanged = false;
-    updateHealth(health1, player1Health);
-    updateHealth(health2, player2Health);
+    updateHealth(health1, lostHealth1, player1Health);
+    updateHealth(health2, lostHealth2, player2Health);
     updateUltimate(ultimate1, player1Ultimate);
     updateUltimate(ultimate2, player2Ultimate);
     player1.style.left = '100px';
     player1.style.top = '100px';
-    player2.style.right = '100px';
+    player2.style.left = '400px';
     player2.style.top = '100px';
 }
 

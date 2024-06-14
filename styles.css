@@ -5,7 +5,6 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #f0f0f0;
-    
 }
 
 #game {
@@ -55,39 +54,45 @@ body {
     background-color: red;
 }
 
-.ball.purple {
-    background-color: purple;
-}
-
 .health-bar, .ultimate-bar {
     position: absolute;
     width: 100px;
     height: 10px;
     background-color: #555;
 }
+
 .health {
     background-color: red;
 }
+
+.lost-health {
+    background-color: green;
+}
+
 .ultimate {
     background-color: blue;
 }
+
 #health1 {
     left: 10px;
     top: 10px;
-    
+    background-color: greenyellow;
 }
+
 #ultimate1 {
     left: 10px;
     top: 30px;
-   
+    background-color:  red;
 }
+
 #health2 {
     right: 10px;
     top: 10px;
-    
+    background-color: crimson;
 }
+
 #ultimate2 {
     right: 10px;
     top: 30px;
-    
+    background-color: cyan;
 }
