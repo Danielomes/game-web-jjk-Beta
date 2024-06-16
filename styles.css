@@ -126,3 +126,18 @@ body {
         height: 50px;
     }
 }
+.message {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    text-shadow: 2px 2px 4px black;
+    z-index: 9999;
+
+    transition: opacity 0.3s ease-in-out; /* Animação de fade */
+}
+
+.message.active {
+    opacity: 1; /* Torna o texto visível */
+}

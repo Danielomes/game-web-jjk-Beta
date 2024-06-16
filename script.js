@@ -8,6 +8,7 @@ const lostHealth2 = document.getElementById('health2').querySelector('.lost-heal
 const ultimate1 = document.getElementById('ultimate1').querySelector('.ultimate');
 const ultimate2 = document.getElementById('ultimate2').querySelector('.ultimate');
 
+
 let player1Health = 10;
 let player2Health = 10;
 let player1Ultimate = 0;
@@ -17,8 +18,9 @@ let player1UltimateActive = false;
 let player2UltimateActive = false;
 let backgroundColorChanged = false;
 
-const playerSpeed = 10;
-const ultimateChargeSpeed = 10;
+
+const playerSpeed = 15;
+const ultimateChargeSpeed = 100;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000;  // 6 seconds
 
@@ -92,20 +94,22 @@ document.addEventListener('keydown', (event) => {
         // Habilidade especial de mudança de fundo
         case 't':
             if (!backgroundColorChanged && player1UltimateActive) {
-                changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png');
-                dealGuaranteedDamage(player2, 5);
+                changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png', 'Ultimate de Player 1 Ativada!');
+                // dealGuaranteedDamage(player2, 5); // Exemplo de função, substitua com a lógica do seu jogo
                 player1UltimateActive = false;
             }
             break;
         case 'b':
             if (!backgroundColorChanged && player2UltimateActive) {
-                changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg');
-                paralyzePlayer(player1, paralysisDuration);
+                changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Ultimate de Player 2 Ativada!');
+                // paralyzePlayer(player1, paralysisDuration); // Exemplo de função, substitua com a lógica do seu jogo
                 player2UltimateActive = false;
             }
             break;
     }
 });
+
+
 
 
 function movePlayer(player, dx, dy) {
