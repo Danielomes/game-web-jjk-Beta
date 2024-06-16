@@ -95,7 +95,6 @@ document.addEventListener('keydown', (event) => {
         case 't':
             if (!backgroundColorChanged && player1UltimateActive) {
                 changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png', 'Ultimate de Player 1 Ativada!');
-                // dealGuaranteedDamage(player2, 5); // Exemplo de função, substitua com a lógica do seu jogo
                 dealGuaranteedDamage(player2, 5);
                 player1UltimateActive = false;
                 
@@ -104,10 +103,10 @@ document.addEventListener('keydown', (event) => {
         case 'b':
             if (!backgroundColorChanged && player2UltimateActive) {
                 changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Ultimate de Player 2 Ativada!');
-                // paralyzePlayer(player1, paralysisDuration); // Exemplo de função, substitua com a lógica do seu jogo
                 paralyzePlayer(player1, paralysisDuration);
                 player2UltimateActive = false;
-
+            } else if (!player2UltimateActive) {
+                launchMine(player2, 'left');
             }
             break;
     }
@@ -169,6 +168,67 @@ function shootBall(player, direction, isUltimate) {
         }
     }, 20);
 }
+function launchMine(player, direction) {
+    const mine = document.createElement('div');
+    mine.classList.add('mine');
+    game.appendChild(mine);
+
+    const playerRect = player.getBoundingClientRect();
+    const gameRect = game.getBoundingClientRect();
+    const randomDistance = Math.floor(Math.random() * (300 - 23 + 1)) + 23;
+
+    if (direction === 'left') {
+        mine.style.left = playerRect.left - gameRect.left - randomDistance + 'px';
+    } else {
+        mine.style.left = playerRect.right - gameRect.left + randomDistance + 'px';
+    }
+
+    mine.style.top = playerRect.top - gameRect.top + (playerRect.height / 2 - 10) + 'px';
+
+    checkMineCollision(mine);
+}
+
+function checkMineCollision(mine) {
+    let collisionInterval = setInterval(() => {
+        const mineRect = mine.getBoundingClientRect();
+        const player1Rect = player1.getBoundingClientRect();
+        const player2Rect = player2.getBoundingClientRect();
+        const purpleProjectileRect = purpleProjectile ? purpleProjectile.getBoundingClientRect() : null;
+
+        if (isColliding(mineRect, player1Rect)) {
+            player1Health -= 3;
+            updateHealth(health1, lostHealth1, player1Health);
+            mine.remove();
+            clearInterval(collisionInterval);
+        } else if (isColliding(mineRect, player2Rect)) {
+            player2Health -= 3;
+            updateHealth(health2, lostHealth2, player2Health);
+            mine.remove();
+            clearInterval(collisionInterval);
+        } else if (purpleProjectileRect && isColliding(mineRect, purpleProjectileRect)) {
+            causeFullMapExplosion();
+            mine.remove();
+            purpleProjectile.remove();
+            clearInterval(collisionInterval);
+        }
+    }, 100);
+}
+
+function causeFullMapExplosion() {
+    const explosion = document.createElement('div');
+    explosion.classList.add('explosion');
+    game.appendChild(explosion);
+
+    player1Health -= 7;
+    player2Health -= 7;
+
+    updateHealth(health1, lostHealth1, player1Health);
+    updateHealth(health2, lostHealth2, player2Health);
+
+    setTimeout(() => {
+        explosion.remove();
+    }, 500); // Remove explosão após 0,5 segundos
+}
 
 function launchUltimateRectangle(player, direction) {
     const rect = document.createElement('div');
@@ -204,40 +264,37 @@ function launchUltimateRectangle(player, direction) {
 }
 
 function launchPurpleProjectile(player, direction) {
-    const projectile = document.createElement('div');
-    projectile.classList.add('purple-projectile');
-    game.appendChild(projectile);
+    purpleProjectile = document.createElement('div');
+    purpleProjectile.classList.add('purple-projectile');
+    game.appendChild(purpleProjectile);
 
     const playerRect = player.getBoundingClientRect();
     const gameRect = game.getBoundingClientRect();
 
-    // Ajustar para que o projétil surja do lado esquerdo do player 2
-    projectile.style.left = playerRect.left - gameRect.left - 32 + 'px';
-    projectile.style.top = playerRect.top - gameRect.top + (playerRect.height / 2 - 10) + 'px';
+    purpleProjectile.style.left = playerRect.left - gameRect.left - 32 + 'px';
+    purpleProjectile.style.top = playerRect.top - gameRect.top + (playerRect.height / 2) + 'px';
 
-    setTimeout(() => {
-        projectile.style.transition = 'width 0.5s ease-out, height 0.5s ease-out';
-        projectile.style.width = '50px';
-        projectile.style.height = '50px';
+    const interval = setInterval(() => {
+        const currentLeft = parseInt(purpleProjectile.style.left);
 
-        let moveInterval = setInterval(() => {
-            let currentLeft = parseInt(projectile.style.left);
+        if (direction === 'left') {
+            purpleProjectile.style.left = (currentLeft - 10) + 'px';
+        } else {
+            purpleProjectile.style.left = (currentLeft + 10) + 'px';
+        }
 
-            if (direction === 'right') {
-                projectile.style.left = currentLeft + 5 + 'px';
-            } else {
-                projectile.style.left = currentLeft - 5 + 'px';
+        const purpleProjectileRect = purpleProjectile.getBoundingClientRect();
+        const gameRect = game.getBoundingClientRect();
+
+        if (purpleProjectileRect.right < gameRect.left || purpleProjectileRect.left > gameRect.right) {
+            purpleProjectile.remove();
+            clearInterval(interval);
+        } else {
+            if (checkCollision(purpleProjectile, player1, player2, true)) {
+                clearInterval(interval);
             }
-
-            // Checar colisão com os jogadores
-            checkCollision(projectile, player1, player2, true);
-
-            if (currentLeft > gameRect.width || currentLeft < 0) {
-                clearInterval(moveInterval);
-                projectile.remove();
-            }
-        }, 20);
-    }, 500);
+        }
+    }, 50);
 }
 
 function checkCollision(projectile, player1, player2, isUltimate) {
@@ -250,19 +307,24 @@ function checkCollision(projectile, player1, player2, isUltimate) {
         player1Health -= damage;
         updateHealth(health1, lostHealth1, player1Health);
         projectile.remove();
+        return true; // Collision detected
     } else if (isColliding(projectileRect, player2Rect)) {
         const damage = isUltimate ? 7 : 1;
         player2Health -= damage;
         updateHealth(health2, lostHealth2, player2Health);
         projectile.remove();
+        return true; // Collision detected
     }
+    return false; // No collision
 }
 
 function isColliding(rect1, rect2) {
-    return !(rect1.right < rect2.left || 
-             rect1.left > rect2.right || 
-             rect1.bottom < rect2.top || 
-             rect1.top > rect2.bottom);
+    return (
+        rect1.left < rect2.right &&
+        rect1.right > rect2.left &&
+        rect1.top < rect2.bottom &&
+        rect1.bottom > rect2.top
+    );
 }
 
 function updateHealth(healthElement, lostHealthElement, health) {
@@ -346,9 +408,9 @@ function resetGame() {
     updateUltimate(ultimate1, player1Ultimate);
     updateUltimate(ultimate2, player2Ultimate);
     player1.style.left = '100px';
-    player1.style.top = '100px';
-    player2.style.left = '400px';
-    player2.style.top = '100px';
+    player1.style.bottom = '50px';
+    player2.style.right = '100px';
+    player2.style.bottom = '50px';
 }
 
 setInterval(chargeUltimate, 1000);
