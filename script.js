@@ -96,14 +96,18 @@ document.addEventListener('keydown', (event) => {
             if (!backgroundColorChanged && player1UltimateActive) {
                 changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png', 'Ultimate de Player 1 Ativada!');
                 // dealGuaranteedDamage(player2, 5); // Exemplo de função, substitua com a lógica do seu jogo
+                dealGuaranteedDamage(player2, 5);
                 player1UltimateActive = false;
+                
             }
             break;
         case 'b':
             if (!backgroundColorChanged && player2UltimateActive) {
                 changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Ultimate de Player 2 Ativada!');
                 // paralyzePlayer(player1, paralysisDuration); // Exemplo de função, substitua com a lógica do seu jogo
+                paralyzePlayer(player1, paralysisDuration);
                 player2UltimateActive = false;
+
             }
             break;
     }
