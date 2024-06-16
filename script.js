@@ -18,7 +18,7 @@ let player2UltimateActive = false;
 let backgroundColorChanged = false;
 
 const playerSpeed = 10;
-const ultimateChargeSpeed = 100;
+const ultimateChargeSpeed = 10;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000;  // 6 seconds
 
@@ -60,14 +60,13 @@ document.addEventListener('keydown', (event) => {
                 shootBall(player1, 'right', false);
             }
             break;
-            case 'm':
-                if (player2UltimateActive) {
-                    
-                    launchPurpleProjectile(player2, 'left'); // Lançar projétil roxo
-                } else {
-                    shootBall(player2, 'left', false);
-                }
-                break;
+        case 'm':
+            if (player2UltimateActive) {
+                launchPurpleProjectile(player2, 'left'); // Lançar projétil roxo
+            } else {
+                shootBall(player2, 'left', false);
+            }
+            break;
         // Ultimate
         case 'e':
             if (player1Ultimate === ultimateFullCharge) {
@@ -81,7 +80,6 @@ document.addEventListener('keydown', (event) => {
                 player2UltimateActive = true;
                 player2Ultimate = 0;
                 updateUltimate(ultimate2, player2Ultimate);
-                
             }
             break;
         // Habilidade corpo a corpo
@@ -206,7 +204,7 @@ function launchPurpleProjectile(player, direction) {
     const gameRect = game.getBoundingClientRect();
 
     // Ajustar para que o projétil surja do lado esquerdo do player 2
-    projectile.style.left = playerRect.left - gameRect.left - 25 + 'px';
+    projectile.style.left = playerRect.left - gameRect.left - 32 + 'px';
     projectile.style.top = playerRect.top - gameRect.top + (playerRect.height / 2 - 10) + 'px';
 
     setTimeout(() => {

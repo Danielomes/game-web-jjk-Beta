@@ -11,7 +11,7 @@ body {
     position: relative;
     width: 800px;
     height: 400px;
-    background-color: #fff;
+    background-image: url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/f8252e7b-a982-45af-b5c8-10465cf523c2/d4c3117-515ca734-1ce6-4ef4-acf7-a41f06adc518.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2Y4MjUyZTdiLWE5ODItNDVhZi1iNWM4LTEwNDY1Y2Y1MjNjMlwvZDRjMzExNy01MTVjYTczNC0xY2U2LTRlZjQtYWNmNy1hNDFmMDZhZGM1MTguanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.FiQ4UjnoGOTBvEd7fnClEBLCmSVMBJnhB0ZG-bDxCeo);
     border: 2px solid #000;
     background-size: cover;
     background-repeat: no-repeat;
@@ -61,41 +61,45 @@ body {
     background-color: #555;
 }
 
-.health {
+/* .health {
     background-color: red;
-}
+    height: 100%;
+} */
 
 .lost-health {
-    background-color: green;
+    background-color: greenyellow;
+    height: 100%;
 }
 
 .ultimate {
     background-color: blue;
+    height: 100%;
 }
 
 #health1 {
     left: 10px;
     top: 10px;
-    background-color: greenyellow;
+    background-color: red;
 }
 
 #ultimate1 {
     left: 10px;
-    top: 30px;
-    background-color:  red;
+    top: 22px;
+    background-color: red;
 }
 
 #health2 {
     right: 10px;
     top: 10px;
-    background-color: crimson;
+    background-color: red;
 }
 
 #ultimate2 {
     right: 10px;
-    top: 30px;
+    top: 22px;
     background-color: cyan;
 }
+
 .purple-projectile {
     position: absolute;
     width: 20px;
@@ -103,25 +107,22 @@ body {
     background-color: purple;
     border-radius: 50%;
     z-index: 10;
-    animation: hollow 3s  ;
+    animation: hollow 3s ease-out;
 }
 
 @keyframes hollow {
-    0%{
+    0% {
         width: 20px;
         height: 20px;
     }
 
-    3%{
-        
+    3% {
         width: 20px;
         height: 20px;
-      
     }
 
-    100%{
+    100% {
         width: 50px;
         height: 50px;
     }
-
 }
