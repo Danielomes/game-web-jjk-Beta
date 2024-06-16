@@ -60,13 +60,14 @@ document.addEventListener('keydown', (event) => {
                 shootBall(player1, 'right', false);
             }
             break;
-        case 'm':
-            if (player2UltimateActive) {
-                launchUltimateRectangle(player2, 'left');
-            } else {
-                shootBall(player2, 'left', false);
-            }
-            break;
+            case 'm':
+                if (player2UltimateActive) {
+                    
+                    launchPurpleProjectile(player2, 'left'); // Lançar projétil roxo
+                } else {
+                    shootBall(player2, 'left', false);
+                }
+                break;
         // Ultimate
         case 'e':
             if (player1Ultimate === ultimateFullCharge) {
@@ -80,6 +81,7 @@ document.addEventListener('keydown', (event) => {
                 player2UltimateActive = true;
                 player2Ultimate = 0;
                 updateUltimate(ultimate2, player2Ultimate);
+                
             }
             break;
         // Habilidade corpo a corpo
@@ -106,6 +108,7 @@ document.addEventListener('keydown', (event) => {
             break;
     }
 });
+
 
 function movePlayer(player, dx, dy) {
     const playerRect = player.getBoundingClientRect();
@@ -194,21 +197,58 @@ function launchUltimateRectangle(player, direction) {
     }, 500);
 }
 
-function checkCollision(ball, player1, player2, isUltimate) {
-    const ballRect = ball.getBoundingClientRect();
+function launchPurpleProjectile(player, direction) {
+    const projectile = document.createElement('div');
+    projectile.classList.add('purple-projectile');
+    game.appendChild(projectile);
+
+    const playerRect = player.getBoundingClientRect();
+    const gameRect = game.getBoundingClientRect();
+
+    // Ajustar para que o projétil surja do lado esquerdo do player 2
+    projectile.style.left = playerRect.left - gameRect.left - 25 + 'px';
+    projectile.style.top = playerRect.top - gameRect.top + (playerRect.height / 2 - 10) + 'px';
+
+    setTimeout(() => {
+        projectile.style.transition = 'width 0.5s ease-out, height 0.5s ease-out';
+        projectile.style.width = '50px';
+        projectile.style.height = '50px';
+
+        let moveInterval = setInterval(() => {
+            let currentLeft = parseInt(projectile.style.left);
+
+            if (direction === 'right') {
+                projectile.style.left = currentLeft + 5 + 'px';
+            } else {
+                projectile.style.left = currentLeft - 5 + 'px';
+            }
+
+            // Checar colisão com os jogadores
+            checkCollision(projectile, player1, player2, true);
+
+            if (currentLeft > gameRect.width || currentLeft < 0) {
+                clearInterval(moveInterval);
+                projectile.remove();
+            }
+        }, 20);
+    }, 500);
+}
+
+function checkCollision(projectile, player1, player2, isUltimate) {
+    const projectileRect = projectile.getBoundingClientRect();
     const player1Rect = player1.getBoundingClientRect();
     const player2Rect = player2.getBoundingClientRect();
 
-    if (isColliding(ballRect, player1Rect)) {
+    if (isColliding(projectileRect, player1Rect)) {
         const damage = isUltimate ? 5 : 1;
         player1Health -= damage;
         updateHealth(health1, lostHealth1, player1Health);
-        ball.remove();
-    } else if (isColliding(ballRect, player2Rect)) {
+        projectile.remove();
+    } else if (isColliding(projectileRect, player2Rect)) {
         const damage = isUltimate ? 7 : 1;
         player2Health -= damage;
         updateHealth(health2, lostHealth2, player2Health);
-        ball.remove();
+        projectile.remove();
     }
 }
 
@@ -272,13 +312,12 @@ function changeBackgroundImage(imageUrl) {
         backgroundColorChanged = false;
     }, 5000);
 }
-
 function meleeAttack(attacker, defender, isUltimate) {
     const attackerRect = attacker.getBoundingClientRect();
     const defenderRect = defender.getBoundingClientRect();
 
     if (isColliding(attackerRect, defenderRect)) {
-        const damage = isUltimate ? 2 : 1;
+        const damage = isUltimate ? 7 : 2; // Aumente o dano durante a ultimate
         if (defender === player1) {
             updateHealth(health1, lostHealth1, player1Health -= damage);
         } else {
