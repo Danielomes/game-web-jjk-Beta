@@ -129,6 +129,7 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// colldown
 function triggerCooldown(key) {
     cooldownStatus[key] = true;
     setTimeout(() => {
@@ -137,7 +138,7 @@ function triggerCooldown(key) {
 }
 
 
-
+// movimentação
 function movePlayer(player, dx, dy) {
     const playerRect = player.getBoundingClientRect();
     const gameRect = game.getBoundingClientRect();
@@ -154,7 +155,7 @@ function movePlayer(player, dx, dy) {
     player.style.left = newLeft + 'px';
     player.style.top = newTop + 'px';
 }
-
+// ataque a distancia nun sei :)
 function shootBall(player, direction, isUltimate) {
     const ball = document.createElement('div');
     ball.classList.add('ball');
@@ -191,6 +192,7 @@ function shootBall(player, direction, isUltimate) {
         }
     }, 20);
 }
+// azul normal
 function launchMine(player, direction) {
     const mine = document.createElement('div');
     mine.classList.add('mine');
@@ -237,6 +239,7 @@ function checkMineCollision(mine) {
     }, 100);
 }
 
+// vazio irrestrito
 function causeFullMapExplosion() {
     const explosion = document.createElement('div');
     explosion.classList.add('explosion');
@@ -372,6 +375,7 @@ function launchPurpleProjectile(player, direction) {
     }, 50);
 }
 
+// colisao de playes
 function checkCollision(projectile, player1, player2, isUltimate) {
     const projectileRect = projectile.getBoundingClientRect();
     const player1Rect = player1.getBoundingClientRect();
@@ -443,6 +447,7 @@ function dealGuaranteedDamage(player, damage) {
     }
 }
 
+// expansao de dominio
 function changeBackgroundImage(imageUrl) {
     if (backgroundColorChanged) return;
 
@@ -455,10 +460,12 @@ function changeBackgroundImage(imageUrl) {
         backgroundColorChanged = false;
     }, 5000);
 }
+// soco
 function meleeAttack(attacker, defender, isUltimate) {
     const attackerRect = attacker.getBoundingClientRect();
     const defenderRect = defender.getBoundingClientRect();
 
+    // black flash
     if (isColliding(attackerRect, defenderRect)) {
         const damage = isUltimate ? 7 : 2; // Aumente o dano durante a ultimate
         if (defender === player1) {
@@ -468,6 +475,7 @@ function meleeAttack(attacker, defender, isUltimate) {
         }
     }
 }
+// reset game 
 
 function resetGame() {
     player1Health = 10;
