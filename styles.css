@@ -67,7 +67,7 @@ body {
 } */
 
 .lost-health {
-    background-color: greenyellow;
+    background-color:  red;
     height: 100%;
 }
 
@@ -79,7 +79,7 @@ body {
 #health1 {
     left: 10px;
     top: 10px;
-    background-color: red;
+    background-color: greenyellow;
 }
 
 #ultimate1 {
@@ -91,7 +91,7 @@ body {
 #health2 {
     right: 10px;
     top: 10px;
-    background-color: red;
+    background-color: greenyellow;
 }
 
 #ultimate2 {

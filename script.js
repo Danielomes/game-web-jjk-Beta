@@ -264,18 +264,21 @@ function launchUltimateRectangle(player, direction) {
 }
 
 function launchPurpleProjectile(player, direction) {
-    purpleProjectile = document.createElement('div');
+    const purpleProjectile = document.createElement('div');
     purpleProjectile.classList.add('purple-projectile');
     game.appendChild(purpleProjectile);
 
     const playerRect = player.getBoundingClientRect();
     const gameRect = game.getBoundingClientRect();
 
-    purpleProjectile.style.left = playerRect.left - gameRect.left - 32 + 'px';
+    purpleProjectile.style.left = playerRect.left - gameRect.left - 25 + 'px';
     purpleProjectile.style.top = playerRect.top - gameRect.top + (playerRect.height / 2) + 'px';
 
+    let distanceTraveled = 0;
+    const maxDistance = 800; // Ajuste conforme necessário
+
     const interval = setInterval(() => {
-        const currentLeft = parseInt(purpleProjectile.style.left);
+        let currentLeft = parseInt(purpleProjectile.style.left);
 
         if (direction === 'left') {
             purpleProjectile.style.left = (currentLeft - 10) + 'px';
@@ -283,15 +286,28 @@ function launchPurpleProjectile(player, direction) {
             purpleProjectile.style.left = (currentLeft + 10) + 'px';
         }
 
-        const purpleProjectileRect = purpleProjectile.getBoundingClientRect();
-        const gameRect = game.getBoundingClientRect();
+        distanceTraveled += 10;
 
-        if (purpleProjectileRect.right < gameRect.left || purpleProjectileRect.left > gameRect.right) {
+        const purpleProjectileRect = purpleProjectile.getBoundingClientRect();
+
+        if (purpleProjectileRect.right < gameRect.left || purpleProjectileRect.left > gameRect.right || distanceTraveled >= maxDistance) {
             purpleProjectile.remove();
             clearInterval(interval);
         } else {
             if (checkCollision(purpleProjectile, player1, player2, true)) {
+                purpleProjectile.remove();
                 clearInterval(interval);
+            } else {
+                const mines = document.querySelectorAll('.mine');
+                mines.forEach(mine => {
+                    const mineRect = mine.getBoundingClientRect();
+                    if (isColliding(purpleProjectileRect, mineRect)) {
+                        causeFullMapExplosion();
+                        mine.remove();
+                        purpleProjectile.remove();
+                        clearInterval(interval);
+                    }
+                });
             }
         }
     }, 50);
