@@ -8,7 +8,6 @@ const lostHealth2 = document.getElementById('health2').querySelector('.lost-heal
 const ultimate1 = document.getElementById('ultimate1').querySelector('.ultimate');
 const ultimate2 = document.getElementById('ultimate2').querySelector('.ultimate');
 
-
 let player1Health = 10;
 let player2Health = 10;
 let player1Ultimate = 0;
@@ -18,16 +17,27 @@ let player1UltimateActive = false;
 let player2UltimateActive = false;
 let backgroundColorChanged = false;
 
-
 const playerSpeed = 15;
 const ultimateChargeSpeed = 100;
 const ultimateFullCharge = 100;
-const paralysisDuration = 6000;  // 6 seconds
+const paralysisDuration = 6000; // 6 seconds
+
+// Cooldown status
+const cooldownStatus = {
+    'b': false,
+    'm': false,
+    'q': false,
+    't': false
+};
+
+// Cooldown duration in milliseconds
+const cooldownDuration = 1000;
 
 document.addEventListener('keydown', (event) => {
     if (player1Paralyzed && ['w', 'a', 's', 'd'].includes(event.key)) return;
+    if (cooldownStatus[event.key]) return; // If the key is on cooldown, return
 
-    switch(event.key) {
+    switch (event.key) {
         // Controles do Jogador 1 (WASD)
         case 'w':
             movePlayer(player1, 0, -playerSpeed);
@@ -61,6 +71,7 @@ document.addEventListener('keydown', (event) => {
             } else {
                 shootBall(player1, 'right', false);
             }
+            triggerCooldown('q'); // Trigger cooldown for 'q'
             break;
         case 'm':
             if (player2UltimateActive) {
@@ -68,6 +79,7 @@ document.addEventListener('keydown', (event) => {
             } else {
                 shootBall(player2, 'left', false);
             }
+            triggerCooldown('m'); // Trigger cooldown for 'm'
             break;
         // Ultimate
         case 'e':
@@ -91,13 +103,16 @@ document.addEventListener('keydown', (event) => {
         case ',':
             meleeAttack(player2, player1, false);
             break;
-        // Habilidade especial de mudança de fundo
+        // Habilidade especial de mudança de fundo ou barra horizontal
         case 't':
             if (!backgroundColorChanged && player1UltimateActive) {
                 changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png', 'Ultimate de Player 1 Ativada!');
                 dealGuaranteedDamage(player2, 5);
                 player1UltimateActive = false;
-                
+                triggerCooldown('t'); // Trigger cooldown for 't'
+            } else if (!player1UltimateActive) {
+                launchHorizontalBar(player1);
+                triggerCooldown('t'); // Trigger cooldown for 't'
             }
             break;
         case 'b':
@@ -105,13 +120,21 @@ document.addEventListener('keydown', (event) => {
                 changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Ultimate de Player 2 Ativada!');
                 paralyzePlayer(player1, paralysisDuration);
                 player2UltimateActive = false;
+                triggerCooldown('b'); // Trigger cooldown for 'b'
             } else if (!player2UltimateActive) {
                 launchMine(player2, 'left');
+                triggerCooldown('b'); // Trigger cooldown for 'b'
             }
             break;
     }
 });
 
+function triggerCooldown(key) {
+    cooldownStatus[key] = true;
+    setTimeout(() => {
+        cooldownStatus[key] = false;
+    }, cooldownDuration);
+}
 
 
 
@@ -230,6 +253,8 @@ function causeFullMapExplosion() {
     }, 500); // Remove explosão após 0,5 segundos
 }
 
+// sukuna
+
 function launchUltimateRectangle(player, direction) {
     const rect = document.createElement('div');
     rect.classList.add('rect', 'ultimate');
@@ -262,7 +287,41 @@ function launchUltimateRectangle(player, direction) {
         }, 20);
     }, 500);
 }
+// corte do sukuna
+function launchHorizontalBar(player) {
+    const bar = document.createElement('div');
+    bar.classList.add('horizontal-bar');
+    game.appendChild(bar);
 
+    const playerRect = player.getBoundingClientRect();
+    const gameRect = game.getBoundingClientRect();
+
+    bar.style.left = playerRect.left - gameRect.left + 'px';
+    bar.style.top = playerRect.top - gameRect.top + (playerRect.height / 2 - 10) + 'px';
+
+    let moveInterval = setInterval(() => {
+        let currentLeft = parseInt(bar.style.left);
+        bar.style.left = currentLeft + 5 + 'px';
+
+        const barRect = bar.getBoundingClientRect();
+        const player2Rect = player2.getBoundingClientRect();
+
+        // Checa se a barra colidiu com o player 2
+        if (isColliding(barRect, player2Rect)) {
+            player2Health -= 3;
+            updateHealth(health2, lostHealth2, player2Health);
+            clearInterval(moveInterval);
+            bar.remove();
+        } else if (barRect.right > gameRect.width) {
+            clearInterval(moveInterval);
+            bar.remove();
+        }
+    }, 20);
+}
+
+
+// gojo
+// vermelho
 function launchPurpleProjectile(player, direction) {
     const purpleProjectile = document.createElement('div');
     purpleProjectile.classList.add('purple-projectile');
