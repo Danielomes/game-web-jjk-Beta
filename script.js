@@ -22,12 +22,26 @@ const ultimateChargeSpeed = 100;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
 
+const cooldownDurations = {
+    'q': 1000, // Lançar bola para Player 1
+    'm': 1500, // Lançar bola para Player 2
+    'e': 3000, // Ultimate para Player 1
+    'n': 3000, // Ultimate para Player 2
+    'r': 2000, // Habilidade corpo a corpo Player 1
+    ',': 2000, // Habilidade corpo a corpo Player 2
+    't': 5000, // Mudança de fundo ou barra horizontal Player 1
+    'b': 5000  // Mudança de fundo ou mina Player 2
+};
 // Cooldown status
 const cooldownStatus = {
-    'b': false,
-    'm': false,
     'q': false,
-    't': false
+    'm': false,
+    'e': false,
+    'n': false,
+    'r': false,
+    ',': false,
+    't': false,
+    'b': false
 };
 
 // Cooldown duration in milliseconds
@@ -134,7 +148,7 @@ function triggerCooldown(key) {
     cooldownStatus[key] = true;
     setTimeout(() => {
         cooldownStatus[key] = false;
-    }, cooldownDuration);
+    }, cooldownDurations[key]);
 }
 
 
@@ -440,10 +454,21 @@ function paralyzePlayer(player, duration) {
     }
 }
 
-function dealGuaranteedDamage(player, damage) {
-    if (player === player2) {
+function dealDamage(player, damage) {
+    if (player === player1) {
+        player1Health -= damage;
+        updateHealth(health1, lostHealth1, player1Health);
+        if (player1Health <= 0) {
+            alert('Jogador 2 venceu!');
+            resetGame();
+        }
+    } else {
         player2Health -= damage;
         updateHealth(health2, lostHealth2, player2Health);
+        if (player2Health <= 0) {
+            alert('Jogador 1 venceu!');
+            resetGame();
+        }
     }
 }
 
