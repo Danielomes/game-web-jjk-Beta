@@ -8,8 +8,8 @@ const lostHealth2 = document.getElementById('health2').querySelector('.lost-heal
 const ultimate1 = document.getElementById('ultimate1').querySelector('.ultimate');
 const ultimate2 = document.getElementById('ultimate2').querySelector('.ultimate');
 
-let player1Health = 10;
-let player2Health = 10;
+let player1Health = 20;
+let player2Health = 20;
 let player1Ultimate = 0;
 let player2Ultimate = 0;
 let player1Paralyzed = false;
@@ -18,7 +18,7 @@ let player2UltimateActive = false;
 let backgroundColorChanged = false;
 
 const playerSpeed = 15;
-const ultimateChargeSpeed = 100;
+const ultimateChargeSpeed = 5;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
 
@@ -44,8 +44,20 @@ const cooldownStatus = {
     'b': false
 };
 
-// Cooldown duration in milliseconds
-const cooldownDuration = 1000;
+// Função para exibir uma mensagem na tela
+function showMessage(message) {
+    const existingMessage = document.querySelector('.game-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+    const messageElement = document.createElement('h1');
+    messageElement.classList.add('game-message');
+    messageElement.innerText = message;
+    game.appendChild(messageElement);
+    setTimeout(() => {
+        messageElement.remove();
+    }, 2000); // Remover mensagem após 2 segundos
+}
 
 document.addEventListener('keydown', (event) => {
     if (player1Paralyzed && ['w', 'a', 's', 'd'].includes(event.key)) return;
@@ -55,43 +67,55 @@ document.addEventListener('keydown', (event) => {
         // Controles do Jogador 1 (WASD)
         case 'w':
             movePlayer(player1, 0, -playerSpeed);
+
             break;
         case 'a':
             movePlayer(player1, -playerSpeed, 0);
+
             break;
         case 's':
             movePlayer(player1, 0, playerSpeed);
+
             break;
         case 'd':
             movePlayer(player1, playerSpeed, 0);
+   
             break;
         // Controles do Jogador 2 (Setas direcionais)
         case 'ArrowUp':
             movePlayer(player2, 0, -playerSpeed);
+       
             break;
         case 'ArrowLeft':
             movePlayer(player2, -playerSpeed, 0);
+
             break;
         case 'ArrowDown':
             movePlayer(player2, 0, playerSpeed);
+
             break;
         case 'ArrowRight':
             movePlayer(player2, playerSpeed, 0);
+       
             break;
         // Lançar bola
         case 'q':
             if (player1UltimateActive) {
                 launchUltimateRectangle(player1, 'right');
+                showMessage('fuga');
             } else {
                 shootBall(player1, 'right', false);
+                showMessage('');
             }
             triggerCooldown('q'); // Trigger cooldown for 'q'
             break;
         case 'm':
             if (player2UltimateActive) {
                 launchPurpleProjectile(player2, 'left'); // Lançar projétil roxo
+                showMessage('Red');
             } else {
                 shootBall(player2, 'left', false);
+                showMessage('');
             }
             triggerCooldown('m'); // Trigger cooldown for 'm'
             break;
@@ -101,6 +125,7 @@ document.addEventListener('keydown', (event) => {
                 player1UltimateActive = true;
                 player1Ultimate = 0;
                 updateUltimate(ultimate1, player1Ultimate);
+                showMessage('Rei das maldições');
             }
             break;
         case 'n':
@@ -108,6 +133,7 @@ document.addEventListener('keydown', (event) => {
                 player2UltimateActive = true;
                 player2Ultimate = 0;
                 updateUltimate(ultimate2, player2Ultimate);
+               
             }
             break;
         // Habilidade corpo a corpo
@@ -120,24 +146,32 @@ document.addEventListener('keydown', (event) => {
         // Habilidade especial de mudança de fundo ou barra horizontal
         case 't':
             if (!backgroundColorChanged && player1UltimateActive) {
-                changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png', 'Ultimate de Player 1 Ativada!');
+                changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png', 'ds');
                 dealGuaranteedDamage(player2, 5);
                 player1UltimateActive = false;
                 triggerCooldown('t'); // Trigger cooldown for 't'
+                showMessage('fukuma mizushi');
+            } else if (!player1UltimateActive && player1Ultimate >= ultimateFullCharge / 2) {
+                launchHalfMapAttack(player1, 'down');
+                triggerCooldown('t'); // Trigger cooldown for 't'
+                showMessage('scale of the dragon recoil twin meteors');
             } else if (!player1UltimateActive) {
                 launchHorizontalBar(player1);
                 triggerCooldown('t'); // Trigger cooldown for 't'
+                showMessage('dismantle');
             }
             break;
         case 'b':
             if (!backgroundColorChanged && player2UltimateActive) {
-                changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Ultimate de Player 2 Ativada!');
+                changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Six eyes');
                 paralyzePlayer(player1, paralysisDuration);
                 player2UltimateActive = false;
                 triggerCooldown('b'); // Trigger cooldown for 'b'
+                showMessage('muryo kusho');
             } else if (!player2UltimateActive) {
                 launchMine(player2, 'left');
                 triggerCooldown('b'); // Trigger cooldown for 'b'
+                showMessage('Azul');
             }
             break;
     }
@@ -265,6 +299,8 @@ function causeFullMapExplosion() {
     updateHealth(health1, lostHealth1, player1Health);
     updateHealth(health2, lostHealth2, player2Health);
 
+    showMessage('VAZIO IMENSURAVEL');
+
     setTimeout(() => {
         explosion.remove();
     }, 500); // Remove explosão após 0,5 segundos
@@ -334,6 +370,34 @@ function launchHorizontalBar(player) {
             bar.remove();
         }
     }, 20);
+}
+// corte que corta o mundo
+function launchHalfMapAttack(player, direction) {
+    const attack = document.createElement('div');
+    attack.classList.add('half-map-attack');
+    game.appendChild(attack);
+
+    const playerRect = player.getBoundingClientRect();
+    const gameRect = game.getBoundingClientRect();
+
+    attack.style.width = gameRect.width + 'px';
+    attack.style.height = gameRect.height / 2 + 'px';
+    attack.style.left = '0px';
+    attack.style.top = playerRect.top - gameRect.top + 'px';
+
+    setTimeout(() => {
+        const attackRect = attack.getBoundingClientRect();
+        const player1Rect = player1.getBoundingClientRect();
+        const player2Rect = player2.getBoundingClientRect();
+
+        // Checa se a habilidade colidiu com algum jogador
+        if (isColliding(attackRect, player2Rect)) {
+            player2Health -= 7;
+            updateHealth(health2, lostHealth2, player2Health);
+        }
+
+        attack.remove();
+    }, 1000); // Tempo que a habilidade permanece na tela
 }
 
 
@@ -420,15 +484,17 @@ function isColliding(rect1, rect2) {
     );
 }
 
-function updateHealth(healthElement, lostHealthElement, health) {
+function updateHealth(healthElement, lostHealthElement, health, playerId) {
     healthElement.style.width = (health * 10) + '%';
     lostHealthElement.style.width = ((10 - health) * 10) + '%';
     if (health <= 0) {
-        alert('Game Over');
+        alert(`Game Over! Player ${playerId} perdeu.`);
         // Reiniciar o jogo
         resetGame();
     }
+    
 }
+
 
 function updateUltimate(ultimateElement, ultimateCharge) {
     ultimateElement.style.width = ultimateCharge + '%';
@@ -511,8 +577,8 @@ function resetGame() {
     player1UltimateActive = false;
     player2UltimateActive = false;
     backgroundColorChanged = false;
-    updateHealth(health1, lostHealth1, player1Health);
-    updateHealth(health2, lostHealth2, player2Health);
+    updateHealth(health1, lostHealth1, player1Health, 1);  // Adiciona o playerId aqui
+    updateHealth(health2, lostHealth2, player2Health, 2);  // Adiciona o playerId aqui
     updateUltimate(ultimate1, player1Ultimate);
     updateUltimate(ultimate2, player2Ultimate);
     player1.style.left = '100px';

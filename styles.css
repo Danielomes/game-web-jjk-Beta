@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Jujutsu Kaisen';
+    src: url('jujutsu-kaisen/Jujutsu\ Kaisen.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     margin: 0;
     display: flex;
@@ -158,7 +165,7 @@ body {
     background-color: rgba(234, 0, 255, 0.9);
     top: 0;
     left: 0;
-    z-index: 9999;
+    z-index: 999;
 }
 .horizontal-bar {
     position: absolute;
@@ -166,4 +173,25 @@ body {
     height: 20px;
     background-color: orange;
     z-index: 10;
+}
+.half-map-attack {
+    position: absolute;
+    background-color: rgba(255, 0, 0, 0.5); /* Cor semitransparente para visualização */
+    z-index: 10; /* Certifique-se de que a habilidade esteja acima dos jogadores */
+}
+h1{
+    color: white;
+    text-align: center;
+    font-family: 'Jujutsu Kaisen', sans-serif;
+    text-shadow:
+    2px 2px 0 #000, /* horizontal e vertical com cor */
+    -2px 2px 0 #000,
+    2px -2px 0 #000,
+    -2px -2px 0 #000,
+    2px 0 0 #000,
+    -2px 0 0 #000,
+    0 2px 0 #000,
+    0 -2px 0 #000; /* criando a borda */
+
+    z-index: 9999;
 }
