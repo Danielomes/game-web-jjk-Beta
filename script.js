@@ -58,7 +58,20 @@ function showMessage(message) {
         messageElement.remove();
     }, 2000); // Remover mensagem após 2 segundos
 }
+let player2ControlsEnabled = false; // Variável para controlar o estado dos controles do player 2
 
+document.getElementById('play2').addEventListener('click', () => {
+    player2ControlsEnabled = true; // Ativar os controles do player 2
+});
+
+// HAKARI
+
+document.getElementById('addCharacter').addEventListener('click', () => {
+    const player2 = document.getElementById('player2');
+    player2.style.backgroundColor = 'green'; // Substitui o player2 com um novo personagem
+    // Aqui você pode adicionar mais lógica para configurar o novo personagem
+    player2ControlsEnabled = true; // Ativar os controles do player 2
+});
 document.addEventListener('keydown', (event) => {
     if (player1Paralyzed && ['w', 'a', 's', 'd'].includes(event.key)) return;
     if (cooldownStatus[event.key]) return; // If the key is on cooldown, return
@@ -67,37 +80,58 @@ document.addEventListener('keydown', (event) => {
         // Controles do Jogador 1 (WASD)
         case 'w':
             movePlayer(player1, 0, -playerSpeed);
-
             break;
         case 'a':
             movePlayer(player1, -playerSpeed, 0);
-
             break;
         case 's':
             movePlayer(player1, 0, playerSpeed);
-
             break;
         case 'd':
             movePlayer(player1, playerSpeed, 0);
-   
             break;
+
+        // Controles do Jogador 2 (Setas direcionais) - Verifique se os controles do player 2 estão ativados
+        case 'ArrowUp':
+        case 'ArrowLeft':
+        case 'ArrowDown':
+        case 'ArrowRight':
+        case 'm':
+        case 'n':
+        case 'b':
+            if (!player2ControlsEnabled) return; // Retorna se os controles do player 2 não estão ativados
+            break;
+    }
+
+    switch (event.key) {
+        // Controles do Jogador 1 (WASD)
+        case 'w':
+            movePlayer(player1, 0, -playerSpeed);
+            break;
+        case 'a':
+            movePlayer(player1, -playerSpeed, 0);
+            break;
+        case 's':
+            movePlayer(player1, 0, playerSpeed);
+            break;
+        case 'd':
+            movePlayer(player1, playerSpeed, 0);
+            break;
+
         // Controles do Jogador 2 (Setas direcionais)
         case 'ArrowUp':
             movePlayer(player2, 0, -playerSpeed);
-       
             break;
         case 'ArrowLeft':
             movePlayer(player2, -playerSpeed, 0);
-
             break;
         case 'ArrowDown':
             movePlayer(player2, 0, playerSpeed);
-
             break;
         case 'ArrowRight':
             movePlayer(player2, playerSpeed, 0);
-       
             break;
+
         // Lançar bola
         case 'q':
             if (player1UltimateActive) {
@@ -119,6 +153,7 @@ document.addEventListener('keydown', (event) => {
             }
             triggerCooldown('m'); // Trigger cooldown for 'm'
             break;
+
         // Ultimate
         case 'e':
             if (player1Ultimate === ultimateFullCharge) {
@@ -133,9 +168,9 @@ document.addEventListener('keydown', (event) => {
                 player2UltimateActive = true;
                 player2Ultimate = 0;
                 updateUltimate(ultimate2, player2Ultimate);
-               
             }
             break;
+
         // Habilidade corpo a corpo
         case 'r':
             meleeAttack(player1, player2, false);
@@ -143,6 +178,7 @@ document.addEventListener('keydown', (event) => {
         case ',':
             meleeAttack(player2, player1, false);
             break;
+
         // Habilidade especial de mudança de fundo ou barra horizontal
         case 't':
             if (!backgroundColorChanged && player1UltimateActive) {
@@ -176,6 +212,8 @@ document.addEventListener('keydown', (event) => {
             break;
     }
 });
+
+
 
 // colldown
 function triggerCooldown(key) {
