@@ -18,7 +18,7 @@ let player2UltimateActive = false;
 let backgroundColorChanged = false;
 
 const playerSpeed = 15;
-const ultimateChargeSpeed = 5;
+const ultimateChargeSpeed = 50;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
 
@@ -557,7 +557,14 @@ function paralyzePlayer(player, duration) {
         }, duration);
     }
 }
+function dealGuaranteedDamage(player, damage) {
+    if (player === player2) {
+        player2Health -= damage;  // Subtrai o dano da saúde do player2
+        updateHealth(player2, player2Health);  // Atualiza a exibição da saúde do player2
+    }
+}
 
+// nao sei oque isso faz //nao mexer\\
 function dealDamage(player, damage) {
     if (player === player1) {
         player1Health -= damage;
