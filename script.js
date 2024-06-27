@@ -18,7 +18,7 @@ let player2UltimateActive = false;
 let backgroundColorChanged = false;
 
 const playerSpeed = 15;
-const ultimateChargeSpeed = 1;
+const ultimateChargeSpeed = 10;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
 
@@ -502,37 +502,37 @@ function launchPurpleProjectile(player, direction) {
 
 // JACKPOT
 function roletaDeNumeros() {
-    // Decidir com 40% de chance se os números serão iguais
-    const numerosIguais = Math.random() < 0.05;
+    if (player2Ultimate >= 10) { // Verifica se há pelo menos 10% de ultimate disponível
+        player2Ultimate -= 10; // Consome 10% da ultimate do player2
+    } else {
+        showMessage("nao pode usar a roleta."); // Mensagem de aviso se não houver ultimate suficiente
+        return; // Retorna sem executar o resto da função se não houver ultimate suficiente
+    }
 
+    // Restante da função roletaDeNumeros continua aqui...
+
+    const numerosIguais = Math.random() < 0.05;
     let numero1, numero2, numero3;
 
     if (numerosIguais) {
-        // Sortear um número entre 1 e 7
         numero1 = Math.floor(Math.random() * 7) + 1;
-        // Todos os números serão iguais
         numero2 = numero1;
         numero3 = numero1;
     } else {
-        // Sortear três números independentes entre 1 e 7
         numero1 = Math.floor(Math.random() * 7) + 1;
         numero2 = Math.floor(Math.random() * 7) + 1;
         numero3 = Math.floor(Math.random() * 7) + 1;
     }
 
-    // Exibindo os números sorteados na tela
     showMessage(` ${numero1}, ${numero2}, ${numero3}`);
     rastle('https://pbs.twimg.com/media/F6zFGOgWYAApwDU.jpg', 'ds');
+    
     if (numero1 === numero2 && numero2 === numero3) {
         showMessage(` ${numero1}, ${numero2}, ${numero3}`);
-        // Restaurar vida aos poucos durante 30 segundos
-        // puxar o function jackpot
         jackpot();
         changeBackgroundImage('https://i.pinimg.com/originals/d7/4b/67/d74b6737ae912d33bba82f3a4dcc4a30.gif', 'ds');
         playAudio('tuca.mp3');
-    
     }
-    
 }
 function jackpot() {
     let timeElapsed = 0; // Inicializa o contador de tempo
