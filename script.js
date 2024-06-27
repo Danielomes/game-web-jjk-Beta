@@ -8,8 +8,8 @@ const lostHealth2 = document.getElementById('health2').querySelector('.lost-heal
 const ultimate1 = document.getElementById('ultimate1').querySelector('.ultimate');
 const ultimate2 = document.getElementById('ultimate2').querySelector('.ultimate');
 
-let player1Health = 20;
-let player2Health = 20;
+let player1Health = 10;
+let player2Health = 10;
 let player1Ultimate = 0;
 let player2Ultimate = 0;
 let player1Paralyzed = false;
@@ -18,7 +18,7 @@ let player2UltimateActive = false;
 let backgroundColorChanged = false;
 
 const playerSpeed = 15;
-const ultimateChargeSpeed = 100;
+const ultimateChargeSpeed = 1;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
 
@@ -30,7 +30,8 @@ const cooldownDurations = {
     'r': 2000, // Habilidade corpo a corpo Player 1
     ',': 2000, // Habilidade corpo a corpo Player 2
     't': 5000, // Mudança de fundo ou barra horizontal Player 1
-    'b': 5000  // Mudança de fundo ou mina Player 2
+    'b': 5000,  // Mudança de fundo ou mina Player 2
+    'f': 2000,
 };
 // Cooldown status
 const cooldownStatus = {
@@ -41,7 +42,8 @@ const cooldownStatus = {
     'r': false,
     ',': false,
     't': false,
-    'b': false
+    'b': false,
+    'f': false,
 };
 
 // Função para exibir uma mensagem na tela
@@ -79,16 +81,16 @@ document.addEventListener('keydown', (event) => {
     switch (event.key) {
         // Controles do Jogador 1 (WASD)
         case 'w':
-            movePlayer(player1, 0, -playerSpeed);
+          
             break;
         case 'a':
-            movePlayer(player1, -playerSpeed, 0);
+          
             break;
         case 's':
-            movePlayer(player1, 0, playerSpeed);
+           
             break;
         case 'd':
-            movePlayer(player1, playerSpeed, 0);
+           
             break;
 
         // Controles do Jogador 2 (Setas direcionais) - Verifique se os controles do player 2 estão ativados
@@ -211,6 +213,11 @@ document.addEventListener('keydown', (event) => {
                 showMessage('Azul');
             }
             break;
+            case 'f':
+                if (event.key === 'f') {
+                    roletaDeNumeros();
+                    triggerCooldown('f'); // Trigger cooldown for 'q'
+                }
     }
 });
 
@@ -492,6 +499,70 @@ function launchPurpleProjectile(player, direction) {
     }, 50);
 }
 
+
+// JACKPOT
+function roletaDeNumeros() {
+    // Decidir com 40% de chance se os números serão iguais
+    const numerosIguais = Math.random() < 0.05;
+
+    let numero1, numero2, numero3;
+
+    if (numerosIguais) {
+        // Sortear um número entre 1 e 7
+        numero1 = Math.floor(Math.random() * 7) + 1;
+        // Todos os números serão iguais
+        numero2 = numero1;
+        numero3 = numero1;
+    } else {
+        // Sortear três números independentes entre 1 e 7
+        numero1 = Math.floor(Math.random() * 7) + 1;
+        numero2 = Math.floor(Math.random() * 7) + 1;
+        numero3 = Math.floor(Math.random() * 7) + 1;
+    }
+
+    // Exibindo os números sorteados na tela
+    showMessage(` ${numero1}, ${numero2}, ${numero3}`);
+    rastle('https://pbs.twimg.com/media/F6zFGOgWYAApwDU.jpg', 'ds');
+    if (numero1 === numero2 && numero2 === numero3) {
+        showMessage(` ${numero1}, ${numero2}, ${numero3}`);
+        // Restaurar vida aos poucos durante 30 segundos
+        // puxar o function jackpot
+        jackpot();
+        changeBackgroundImage('https://i.pinimg.com/originals/d7/4b/67/d74b6737ae912d33bba82f3a4dcc4a30.gif', 'ds');
+        playAudio('tuca.mp3');
+    
+    }
+    
+}
+function jackpot() {
+    let timeElapsed = 0; // Inicializa o contador de tempo
+
+    let interval = setInterval(() => {
+        if (timeElapsed < 30) { // Continua enquanto não passaram 30 segundos
+            if (player2Health < 10) {
+                player2Health++;
+                updateHealth(health2, lostHealth2, player2Health);
+            }
+            timeElapsed += 0.3; // Incrementa o tempo em 0.3 segundos (300ms)
+        } else {
+            clearInterval(interval); // Para o intervalo após 30 segundos
+        }
+    }, 300); // Intervalo de 300ms (0.3 segundos)
+}
+function playAudio(audioFile) {
+    const audio = new Audio(audioFile);
+    audio.currentTime = 20;
+    audio.play();
+
+    // Parar o áudio após 30 segundos
+    setTimeout(() => {
+        audio.pause();
+        audio.currentTime = 0; // Reinicia para o início do áudio
+    }, 30000); // 30000 milissegundos = 30 segundos
+}
+
+
+
 // colisao de playes
 function checkCollision(projectile, player1, player2, isUltimate) {
     const projectileRect = projectile.getBoundingClientRect();
@@ -596,6 +667,18 @@ function changeBackgroundImage(imageUrl) {
         game.style.backgroundImage = originalBackgroundImage;
         backgroundColorChanged = false;
     }, 5000);
+}
+function rastle(imageUrl) {
+    if (backgroundColorChanged) return;
+
+    let originalBackgroundImage = window.getComputedStyle(game).backgroundImage;
+    game.style.backgroundImage = `url(${imageUrl})`;
+    backgroundColorChanged = true;
+
+    setTimeout(() => {
+        game.style.backgroundImage = originalBackgroundImage;
+        backgroundColorChanged = false;
+    }, 1000);
 }
 // soco
 function meleeAttack(attacker, defender, isUltimate) {
