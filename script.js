@@ -18,7 +18,7 @@ let player2UltimateActive = false;
 let backgroundColorChanged = false;
 
 const playerSpeed = 15;
-const ultimateChargeSpeed = 50;
+const ultimateChargeSpeed = 100;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
 
@@ -183,7 +183,7 @@ document.addEventListener('keydown', (event) => {
         case 't':
             if (!backgroundColorChanged && player1UltimateActive) {
                 changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png', 'ds');
-                dealGuaranteedDamage(player2, 5);
+                dealDamage(player2, 5);
                 player1UltimateActive = false;
                 triggerCooldown('t'); // Trigger cooldown for 't'
                 showMessage('fukuma mizushi');
@@ -196,6 +196,7 @@ document.addEventListener('keydown', (event) => {
                 triggerCooldown('t'); // Trigger cooldown for 't'
                 showMessage('dismantle');
             }
+            
             break;
         case 'b':
             if (!backgroundColorChanged && player2UltimateActive) {
