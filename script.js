@@ -585,8 +585,6 @@ function doors() {
     specialAttackElement.style.position = 'absolute';
     specialAttackElement.style.width = '200px';
     specialAttackElement.style.height = '90px';
-    specialAttackElement.style.padding =  '0px';
-    specialAttackElement.style.margin = '0px';
     specialAttackElement.style.backgroundColor = 'rgba(255, 0, 0, 0.5)'; // Cor de exemplo
 
     document.body.appendChild(specialAttackElement);
