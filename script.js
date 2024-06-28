@@ -8,7 +8,7 @@ const lostHealth2 = document.getElementById('health2').querySelector('.lost-heal
 const ultimate1 = document.getElementById('ultimate1').querySelector('.ultimate');
 const ultimate2 = document.getElementById('ultimate2').querySelector('.ultimate');
 
-let player1Health = 10;
+let player1Health = 20;
 let player2Health = 10;
 let player1Ultimate = 0;
 let player2Ultimate = 0;
@@ -21,6 +21,7 @@ const playerSpeed = 15;
 const ultimateChargeSpeed = 10;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
+const portas = 1000;
 
 const cooldownDurations = {
     'q': 1000, // Lançar bola para Player 1
@@ -32,6 +33,7 @@ const cooldownDurations = {
     't': 5000, // Mudança de fundo ou barra horizontal Player 1
     'b': 5000,  // Mudança de fundo ou mina Player 2
     'f': 2000,
+    'g': 1000,
 };
 // Cooldown status
 const cooldownStatus = {
@@ -44,6 +46,7 @@ const cooldownStatus = {
     't': false,
     'b': false,
     'f': false,
+    'g': false,
 };
 
 // Função para exibir uma mensagem na tela
@@ -213,11 +216,19 @@ document.addEventListener('keydown', (event) => {
                 showMessage('Azul');
             }
             break;
+
             case 'f':
                 if (event.key === 'f') {
                     roletaDeNumeros();
                     triggerCooldown('f'); // Trigger cooldown for 'q'
                 }
+            break
+            case 'g':
+                if (event.key === 'g') {
+                    doors();
+                    triggerCooldown('g'); // Trigger cooldown for 'q'
+                }
+            break
     }
 });
 
@@ -500,6 +511,8 @@ function launchPurpleProjectile(player, direction) {
 }
 
 
+// HAKARI
+
 // JACKPOT
 function roletaDeNumeros() {
     if (player2Ultimate >= 10) { // Verifica se há pelo menos 10% de ultimate disponível
@@ -511,7 +524,7 @@ function roletaDeNumeros() {
 
     // Restante da função roletaDeNumeros continua aqui...
 
-    const numerosIguais = Math.random() < 0.05;
+    const numerosIguais = Math.random() < 0.5;
     let numero1, numero2, numero3;
 
     if (numerosIguais) {
@@ -525,10 +538,11 @@ function roletaDeNumeros() {
     }
 
     showMessage(` ${numero1}, ${numero2}, ${numero3}`);
-    rastle('https://pbs.twimg.com/media/F6zFGOgWYAApwDU.jpg', 'ds');
+    // rastle('https://pbs.twimg.com/media/F6zFGOgWYAApwDU.jpg', 'ds');
     
     if (numero1 === numero2 && numero2 === numero3) {
-        showMessage(` ${numero1}, ${numero2}, ${numero3}`);
+        showMessage(` ${numero1}, ${numero2}, ${numero3} `);
+        showMessage(` jack pot `);
         jackpot();
         changeBackgroundImage('https://i.pinimg.com/originals/d7/4b/67/d74b6737ae912d33bba82f3a4dcc4a30.gif', 'ds');
         playAudio('tuca.mp3');
@@ -561,7 +575,39 @@ function playAudio(audioFile) {
     }, 30000); // 30000 milissegundos = 30 segundos
 }
 
+// ataqie de fechar de portas
 
+function doors() { 
+    const activationDelay = 1000; // Atraso de ativação em milissegundos
+
+    // Cria o elemento de ataque especial
+    const specialAttackElement = document.createElement('div');
+    specialAttackElement.style.position = 'absolute';
+    specialAttackElement.style.width = '200px';
+    specialAttackElement.style.height = '90px';
+    specialAttackElement.style.padding =  '0px';
+    specialAttackElement.style.margin = '0px';
+    specialAttackElement.style.backgroundColor = 'rgba(255, 0, 0, 0.5)'; // Cor de exemplo
+
+    document.body.appendChild(specialAttackElement);
+
+    // Posiciona o elemento de ataque especial na mesma posição que o player1
+    const player1Rect = player1.getBoundingClientRect();
+    const gameRect = game.getBoundingClientRect();
+
+    specialAttackElement.style.left = player1Rect.left - gameRect.left + (player1Rect. left / 2 + 1)+ 'px';
+    specialAttackElement.style.top = player1Rect.top - gameRect.top + (player1Rect. top / 2 + 1)+ 'px';
+    
+    // Ativa o ataque especial após o atraso
+    setTimeout(() => {
+        if (isColliding(specialAttackElement.getBoundingClientRect(), player1.getBoundingClientRect())) {
+     
+            paralyzePlayer(player1,portas);
+        }
+        // Remove o elemento de ataque especial após a ativação
+        document.body.removeChild(specialAttackElement);
+    }, activationDelay);
+}
 
 // colisao de playes
 function checkCollision(projectile, player1, player2, isUltimate) {
@@ -687,7 +733,7 @@ function meleeAttack(attacker, defender, isUltimate) {
 
     // black flash
     if (isColliding(attackerRect, defenderRect)) {
-        const damage = isUltimate ? 7 : 2; // Aumente o dano durante a ultimate
+        const damage = isUltimate ? 2 : 1; // Aumente o dano durante a ultimate
         if (defender === player1) {
             updateHealth(health1, lostHealth1, player1Health -= damage);
         } else {
