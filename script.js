@@ -258,9 +258,9 @@ function movePlayer(player, dx, dy) {
     // Verifica e ajusta o limite direito
     if (newLeft + playerRect.width > gameRect.width - 30) newLeft = gameRect.width - playerRect.width - 30;
     // Verifica e ajusta o limite superior
-    if (newTop < 30) newTop = 30;
+    if (newTop < 10) newTop = 10;
     // Verifica e ajusta o limite inferior
-    if (newTop + playerRect.height > gameRect.height - 50) newTop = gameRect.height - playerRect.height - 50;
+    if (newTop + playerRect.height > gameRect.height - 10) newTop = gameRect.height - playerRect.height - 10;
     player.style.left = newLeft + 'px';
     player.style.top = newTop + 'px';
 }
@@ -528,7 +528,7 @@ function roletaDeNumeros() {
 
     // Restante da função roletaDeNumeros continua aqui...
 
-    const numerosIguais = Math.random() < 0.5;
+    const numerosIguais = Math.random() < 0.1;
     let numero1, numero2, numero3;
 
     if (numerosIguais) {
@@ -545,8 +545,13 @@ function roletaDeNumeros() {
     // rastle('https://pbs.twimg.com/media/F6zFGOgWYAApwDU.jpg', 'ds');
     
     if (numero1 === numero2 && numero2 === numero3) {
-        showMessage(` ${numero1}, ${numero2}, ${numero3} `);
-        showMessage(` jack pot `);
+        showMessage(` ${numero1}, ${numero2}, ${numero3} `);  
+        jackpot();
+        changeBackgroundImage('https://i.pinimg.com/originals/d7/4b/67/d74b6737ae912d33bba82f3a4dcc4a30.gif', 'ds');
+        playAudio('tuca.mp3');
+    }
+    if (7 === numero1 === numero2 && numero2 === numero3) {
+        showMessage(` ${numero1}, ${numero2}, ${numero3} `);  
         jackpot();
         changeBackgroundImage('https://i.pinimg.com/originals/d7/4b/67/d74b6737ae912d33bba82f3a4dcc4a30.gif', 'ds');
         playAudio('tuca.mp3');
@@ -569,6 +574,7 @@ function jackpot() {
 }
 function playAudio(audioFile) {
     const audio = new Audio(audioFile);
+    audio.volume = 0.5;
     audio.currentTime = 20;
     audio.play();
 
@@ -598,8 +604,8 @@ function doors() {
     const gameRect = game.getBoundingClientRect();
 
     specialAttackElement.style.left = player1Rect.left - gameRect.left + (player1Rect. left / 2 + 1)+ 'px';
-    specialAttackElement.style.top = player1Rect.top - gameRect.top + (player1Rect. top / 2 + 1)+ 'px';
-    
+    specialAttackElement.style.bottom = player1Rect.bottom - gameRect.bottom + (player1Rect. bottom / 2 - 90)+ 'px';
+    specialAttackElement.style.top = player1Rect.top - gameRect.top + (player1Rect. top / 2 -  90)+ 'px';
     // Ativa o ataque especial após o atraso
     setTimeout(() => {
         if (isColliding(specialAttackElement.getBoundingClientRect(), player1.getBoundingClientRect())) {
