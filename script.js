@@ -243,7 +243,7 @@ function triggerCooldown(key) {
 }
 
 
-// movimentação
+// movimentação / ARENA
 function movePlayer(player, dx, dy) {
     const playerRect = player.getBoundingClientRect();
     const gameRect = game.getBoundingClientRect();
@@ -251,12 +251,16 @@ function movePlayer(player, dx, dy) {
     let newLeft = playerRect.left - gameRect.left + dx;
     let newTop = playerRect.top - gameRect.top + dy;
 
-    // Garantir que o jogador não saia da área do jogo
-    if (newLeft < 0) newLeft = 0;
-    if (newLeft + playerRect.width > gameRect.width) newLeft = gameRect.width - playerRect.width;
-    if (newTop < 0) newTop = 0;
-    if (newTop + playerRect.height > gameRect.height) newTop = gameRect.height - playerRect.height;
 
+    // para que o jogo continue fucionando bug porta
+    // Garantir que o jogador não saia da área do jogo
+    if (newLeft < 30) newLeft = 30;
+    // Verifica e ajusta o limite direito
+    if (newLeft + playerRect.width > gameRect.width - 30) newLeft = gameRect.width - playerRect.width - 30;
+    // Verifica e ajusta o limite superior
+    if (newTop < 30) newTop = 30;
+    // Verifica e ajusta o limite inferior
+    if (newTop + playerRect.height > gameRect.height - 50) newTop = gameRect.height - playerRect.height - 50;
     player.style.left = newLeft + 'px';
     player.style.top = newTop + 'px';
 }
@@ -582,9 +586,9 @@ function doors() {
 
     // Cria o elemento de ataque especial
     const specialAttackElement = document.createElement('div');
-    specialAttackElement.style.position = 'absolute';
+    specialAttackElement.style.position = 'absolute';player1
     specialAttackElement.style.width = '200px';
-    specialAttackElement.style.height = '90px';
+    specialAttackElement.style.height = '100px';
     specialAttackElement.style.backgroundColor = 'rgba(255, 0, 0, 0.5)'; // Cor de exemplo
 
     document.body.appendChild(specialAttackElement);
