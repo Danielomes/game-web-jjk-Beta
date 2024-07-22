@@ -254,6 +254,10 @@ document.addEventListener('keydown', (event) => {
             showMessage('');      
       
         break;
+        case 'g': 
+        launchMiniBar('')
+        showMessage('');
+        break
           
     }
 });
@@ -546,8 +550,8 @@ function launchPurpleProjectile(player, direction) {
 
 // JACKPOT
 function roletaDeNumeros() {
-    if (player2Ultimate >= 10) { // Verifica se há pelo menos 10% de ultimate disponível
-        player2Ultimate -= 10; // Consome 10% da ultimate do player2
+    if (player2Ultimate >= 30) { // Verifica se há pelo menos 10% de ultimate disponível
+        player2Ultimate -=30; // Consome 10% da ultimate do player2
     } else {
         showMessage("nao pode usar a roleta."); // Mensagem de aviso se não houver ultimate suficiente
         return; // Retorna sem executar o resto da função se não houver ultimate suficiente
@@ -668,6 +672,39 @@ function switchPlayerPositions() {
 
     showMessage('Players trocaram de posição!');
 }
+
+// punho divergente
+function launchMiniBar(player) {
+    const miniBar = document.createElement('div');
+    miniBar.classList.add('mini-bar');
+    game.appendChild(miniBar);
+
+    const playerRect = player.getBoundingClientRect();
+    const gameRect = game.getBoundingClientRect();
+
+    miniBar.style.left = playerRect.left - gameRect.left + 'px';
+    miniBar.style.top = playerRect.top - gameRect.top + (playerRect.height / 2 - 10) + 'px';
+
+    let moveInterval = setInterval(() => {
+        let currentLeft = parseInt(miniBar.style.left);
+        miniBar.style.left = currentLeft + 5 + 'px';
+
+        const miniBarRect = miniBar.getBoundingClientRect();
+        const player2Rect = player2.getBoundingClientRect();
+
+        // Checa se a mini-barra colidiu com o player 2
+        if (isColliding(miniBarRect, player2Rect)) {
+            player2Health -= 2;
+            updateHealth(health2, lostHealth2, player2Health);
+            clearInterval(moveInterval);
+            miniBar.remove();
+        } else if (miniBarRect.right > gameRect.width) {
+            clearInterval(moveInterval);
+            miniBar.remove();
+        }
+    }, 20);
+}
+
 
 
 // colisao de playes

@@ -193,3 +193,10 @@ h1 {
     0 -2px 0 #000; /* criando a borda */
     z-index: 9999;
 }
+
+.mini-bar {
+    position: absolute;
+    width: 40px; /* Menos da metade do tamanho */
+    height: 20px;
+    background-color: red;
+}
