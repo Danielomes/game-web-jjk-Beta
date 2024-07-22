@@ -7,7 +7,9 @@ const health2 = document.getElementById('health2').querySelector('.health');
 const lostHealth2 = document.getElementById('health2').querySelector('.lost-health');
 const ultimate1 = document.getElementById('ultimate1').querySelector('.ultimate');
 const ultimate2 = document.getElementById('ultimate2').querySelector('.ultimate');
+const specialElement = document.getElementById('special2').querySelector('.special');
 
+let pachinko = 0;
 let player1Health = 20;
 let player2Health = 10;
 let player1Ultimate = 0;
@@ -17,6 +19,8 @@ let player1UltimateActive = false;
 let player2UltimateActive = false;
 let backgroundColorChanged = false;
 
+const pachinkoFullCharge = 20;
+const pachinkoChargeSpeed = 1;
 const playerSpeed = 15;
 const ultimateChargeSpeed = 10;
 const ultimateFullCharge = 100;
@@ -32,8 +36,11 @@ const cooldownDurations = {
     ',': 2000, // Habilidade corpo a corpo Player 2
     't': 5000, // Mudança de fundo ou barra horizontal Player 1
     'b': 5000,  // Mudança de fundo ou mina Player 2
-    'f': 2000,
-    'g': 1000,
+    '7': 2000, // Nova tecla 7
+    '8': 1000, // Nova tecla 8
+    '4': 1000, // Lançar bola para Player 1
+
+
 };
 // Cooldown status
 const cooldownStatus = {
@@ -45,8 +52,8 @@ const cooldownStatus = {
     ',': false,
     't': false,
     'b': false,
-    'f': false,
-    'g': false,
+    '7': false,
+    '8': false,
 };
 
 // Função para exibir uma mensagem na tela
@@ -77,6 +84,8 @@ document.getElementById('addCharacter').addEventListener('click', () => {
     // Aqui você pode adicionar mais lógica para configurar o novo personagem
     player2ControlsEnabled = true; // Ativar os controles do player 2
 });
+
+// comandos
 document.addEventListener('keydown', (event) => {
     if (player1Paralyzed && ['w', 'a', 's', 'd'].includes(event.key)) return;
     if (cooldownStatus[event.key]) return; // If the key is on cooldown, return
@@ -104,6 +113,9 @@ document.addEventListener('keydown', (event) => {
         case 'm':
         case 'n':
         case 'b':
+        case '7':
+        case '8':
+        case '9':
             if (!player2ControlsEnabled) return; // Retorna se os controles do player 2 não estão ativados
             break;
     }
@@ -183,6 +195,10 @@ document.addEventListener('keydown', (event) => {
         case ',':
             meleeAttack(player2, player1, false);
             break;
+        case '9':
+            meleeAttack(player2, player1, false);
+        break;
+        
 
         // Habilidade especial de mudança de fundo ou barra horizontal
         case 't':
@@ -217,20 +233,31 @@ document.addEventListener('keydown', (event) => {
             }
             break;
 
-            case 'f':
-                if (event.key === 'f') {
-                    roletaDeNumeros();
-                    triggerCooldown('f'); // Trigger cooldown for 'q'
-                }
-            break
-            case 'g':
-                if (event.key === 'g') {
-                    doors();
-                    triggerCooldown('g'); // Trigger cooldown for 'q'
-                }
-            break
+        // Atualizações das funções para teclas numéricas
+        case '7':
+            roletaDeNumeros();
+            triggerCooldown('7'); // Trigger cooldown for '7'
+            break;
+        case '8':
+            doors();
+            triggerCooldown('8'); // Trigger cooldown for '8'
+            break;
+        case '4':          
+                shootBall(player2, 'left', false);
+                showMessage('');      
+            triggerCooldown('4'); // Trigger cooldown for 'q'
+            break;
+
+
+            case 'f':          
+            switchPlayerPositions()
+            showMessage('');      
+      
+        break;
+          
     }
 });
+
 
 
 
@@ -528,7 +555,7 @@ function roletaDeNumeros() {
 
     // Restante da função roletaDeNumeros continua aqui...
 
-    const numerosIguais = Math.random() < 0.1;
+    const numerosIguais = Math.random() < 0.5;
     let numero1, numero2, numero3;
 
     if (numerosIguais) {
@@ -574,7 +601,7 @@ function jackpot() {
 }
 function playAudio(audioFile) {
     const audio = new Audio(audioFile);
-    audio.volume = 0.5;
+    audio.volume = 0.009;
     audio.currentTime = 20;
     audio.play();
 
@@ -616,6 +643,32 @@ function doors() {
         document.body.removeChild(specialAttackElement);
     }, activationDelay);
 }
+
+
+// AOI TODO E YUJI ITADORI
+function switchPlayerPositions() {
+    const player1Rect = player1.getBoundingClientRect();
+    const player2Rect = player2.getBoundingClientRect();
+
+    // Calcular a diferença de posição em relação ao contêiner do jogo
+    const gameRect = game.getBoundingClientRect();
+    
+    const player1Left = player1Rect.left - gameRect.left;
+    const player1Top = player1Rect.top - gameRect.top;
+
+    const player2Left = player2Rect.left - gameRect.left;
+    const player2Top = player2Rect.top - gameRect.top;
+
+    // Trocar a posição dos jogadores
+    player1.style.left = player2Left + 'px';
+    player1.style.top = player2Top + 'px';
+
+    player2.style.left = player1Left + 'px';
+    player2.style.top = player1Top + 'px';
+
+    showMessage('Players trocaram de posição!');
+}
+
 
 // colisao de playes
 function checkCollision(projectile, player1, player2, isUltimate) {
@@ -674,6 +727,18 @@ function chargeUltimate() {
         updateUltimate(ultimate2, player2Ultimate);
     }
 }
+function updatePachinko(pachinkoElement, pachinkoCharge) {
+    pachinkoElement.style.width = pachinkoCharge + '%';
+}
+
+function chargePachinko() {
+    if (pachinko < pachinkoFullCharge) {
+        pachinko += pachinkoChargeSpeed;
+        updatePachinko(specialElement, pachinko);
+    }
+}
+
+
 
 function paralyzePlayer(player, duration) {
     if (player === player1) {
