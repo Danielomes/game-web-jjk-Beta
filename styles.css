@@ -173,6 +173,13 @@ body {
     background-color: orange;
     z-index: 10;
 }
+.punch {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-color: blue;
+    z-index: 10;
+}
 .half-map-attack {
     position: absolute;
     background-color: rgba(255, 0, 0, 0.5); /* Cor semitransparente para visualização */

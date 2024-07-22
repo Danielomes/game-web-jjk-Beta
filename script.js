@@ -22,7 +22,7 @@ let backgroundColorChanged = false;
 const pachinkoFullCharge = 20;
 const pachinkoChargeSpeed = 1;
 const playerSpeed = 15;
-const ultimateChargeSpeed = 10;
+const ultimateChargeSpeed = 100;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
 const portas = 1000;
@@ -208,6 +208,7 @@ document.addEventListener('keydown', (event) => {
                 player1UltimateActive = false;
                 triggerCooldown('t'); // Trigger cooldown for 't'
                 showMessage('fukuma mizushi');
+                fukuma('dominsukuna.mp3')
             } else if (!player1UltimateActive && player1Ultimate >= ultimateFullCharge / 2) {
                 launchHalfMapAttack(player1, 'down');
                 triggerCooldown('t'); // Trigger cooldown for 't'
@@ -221,7 +222,7 @@ document.addEventListener('keydown', (event) => {
             break;
         case 'b':
             if (!backgroundColorChanged && player2UltimateActive) {
-                changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Six eyes');
+                fukumamizushi('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Six eyes');
                 paralyzePlayer(player1, paralysisDuration);
                 player2UltimateActive = false;
                 triggerCooldown('b'); // Trigger cooldown for 'b'
@@ -255,7 +256,7 @@ document.addEventListener('keydown', (event) => {
       
         break;
         case 'g': 
-        launchMiniBar('')
+        punhodivergente('')
         showMessage('');
         break
           
@@ -555,7 +556,7 @@ function roletaDeNumeros() {
     } else {
         showMessage("nao pode usar a roleta."); // Mensagem de aviso se não houver ultimate suficiente
         return; // Retorna sem executar o resto da função se não houver ultimate suficiente
-    }
+    }playAudio
 
     // Restante da função roletaDeNumeros continua aqui...
 
@@ -615,8 +616,21 @@ function playAudio(audioFile) {
         audio.currentTime = 0; // Reinicia para o início do áudio
     }, 30000); // 30000 milissegundos = 30 segundos
 }
+function fukuma(audioFile) {
+    const audio = new Audio(audioFile);
+    audio.volume = 0.9;
+    audio.currentTime = 50;
+    audio.play();
 
-// ataqie de fechar de portas
+    // Parar o áudio após 30 segundos
+    setTimeout(() => {
+        audio.pause();
+        audio.currentTime = 0; // Reinicia para o início do áudio
+    }, 15000); // 30000 milissegundos = 30 segundos
+}
+
+
+// ataque de fechar de portas
 
 function doors() { 
     const activationDelay = 1000; // Atraso de ativação em milissegundos
@@ -674,38 +688,48 @@ function switchPlayerPositions() {
 }
 
 // punho divergente
-function launchMiniBar(player) {
-    const miniBar = document.createElement('div');
-    miniBar.classList.add('mini-bar');
-    game.appendChild(miniBar);
+function punhodivergente(player, direction) {
+    // Cria um novo elemento div para o golpe
+    const punch = document.createElement('div');
+    // Adiciona classes ao elemento criado
+    punch.classList.add('punch', 'ultimate');
+    // Adiciona o novo elemento ao jogo
+    game.appendChild(punch);
 
+    // Obtém as coordenadas do jogador e do jogo
     const playerRect = player.getBoundingClientRect();
     const gameRect = game.getBoundingClientRect();
 
-    miniBar.style.left = playerRect.left - gameRect.left + 'px';
-    miniBar.style.top = playerRect.top - gameRect.top + (playerRect.height / 2 - 10) + 'px';
+    // Define a posição inicial do golpe com base na posição do jogador
+    punch.style.left = playerRect.right - gameRect.left + 'px';
+    punch.style.top = playerRect.top - gameRect.top + 'px';
 
-    let moveInterval = setInterval(() => {
-        let currentLeft = parseInt(miniBar.style.left);
-        miniBar.style.left = currentLeft + 5 + 'px';
+    // Define um timeout para iniciar a animação do golpe
+    setTimeout(() => {
+        // Define a transição da animação para aumentar a largura e altura do golpe
+        punch.style.transition = 'width 0.5s ease-out, height 0.5s ease-out';
+        punch.style.width = '50px';
+        punch.style.height = '50px';
 
-        const miniBarRect = miniBar.getBoundingClientRect();
-        const player2Rect = player2.getBoundingClientRect();
+        // Inicia um intervalo para mover o golpe na direção especificada
+        let moveInterval = setInterval(() => {
+            // Obtém a posição atual do golpe
+            let currentLeft = parseInt(punch.style.left);
+            // Move o golpe para a direita ou esquerda com base na direção
+            punch.style.left = direction === 'right' ? currentLeft + 5 + 'px' : currentLeft - 5 + 'px';
 
-        // Checa se a mini-barra colidiu com o player 2
-        if (isColliding(miniBarRect, player2Rect)) {
-            player2Health -= 2;
-            updateHealth(health2, lostHealth2, player2Health);
-            clearInterval(moveInterval);
-            miniBar.remove();
-        } else if (miniBarRect.right > gameRect.width) {
-            clearInterval(moveInterval);
-            miniBar.remove();
-        }
-    }, 20);
+            // Verifica se o golpe colidiu com as paredes do jogo ou com outro jogador
+            if (currentLeft > gameRect.width || currentLeft < 0) {
+                // Se colidiu, limpa o intervalo e remove o golpe
+                clearInterval(moveInterval);
+                punch.remove();
+            } else {
+                // Se não colidiu, verifica colisão com os jogadores
+                checkCollision(punch, player1, player2, true);
+            }
+        }, 20);
+    }, 500);
 }
-
-
 
 // colisao de playes
 function checkCollision(projectile, player1, player2, isUltimate) {
@@ -836,6 +860,20 @@ function rastle(imageUrl) {
         backgroundColorChanged = false;
     }, 1000);
 }
+// sukuna tempo de dominio
+function fukumamizushi(imageUrl) {
+    if (backgroundColorChanged) return;
+
+    let originalBackgroundImage = window.getComputedStyle(game).backgroundImage;
+    game.style.backgroundImage = `url(${imageUrl})`;
+    backgroundColorChanged = true;
+
+    setTimeout(() => {
+        game.style.backgroundImage = originalBackgroundImage;
+        backgroundColorChanged = false;
+    }, 60000);
+}
+
 // soco
 function meleeAttack(attacker, defender, isUltimate) {
     const attackerRect = attacker.getBoundingClientRect();
