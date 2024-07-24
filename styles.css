@@ -40,7 +40,7 @@ body {
 }
 
 #player2 {
-    background-image: blue;
+    background-color: blue;
     right: 50px;
     bottom: 50px;
 }
@@ -206,4 +206,10 @@ h1 {
     width: 40px; /* Menos da metade do tamanho */
     height: 20px;
     background-color: red;
+}
+.damage-box{
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    background-color: cyan;
 }

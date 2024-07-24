@@ -54,14 +54,7 @@ const cooldownStatus = {
     '7': false,
     '8': false,
 };
-document.addEventListener('keyup', (event) => {
-    if (event.key === 'g') {
-        endTime = new Date();
-        const pressDuration = (endTime - startTime) / 1000; // Tempo em segundos
-        showMessage(`Tecla G pressionada por ${pressDuration} segundos`);
-        punhoDivergente(pressDuration); // Chamando a função punhoDivergente com a duração da pressão da tecla
-    }
-});
+
 
 // Função para exibir uma mensagem na tela
 function showMessage(message) {
@@ -690,49 +683,103 @@ function switchPlayerPositions() {
     showMessage('Players trocaram de posição!');
 }
 
-// punho divergente
-function punhodivergente(player, direction) {
-    // Cria um novo elemento div para o golpe
-    const punch = document.createElement('div');
-    // Adiciona classes ao elemento criado
-    punch.classList.add('punch', 'ultimate');
-    // Adiciona o novo elemento ao jogo
-    game.appendChild(punch);
+// PUNHO DIVERGENTE
 
-    // Obtém as coordenadas do jogador e do jogo
-    const playerRect = player.getBoundingClientRect();
-    const gameRect = game.getBoundingClientRect();
+const initialDamage = 1;
+const increasedDamage = 3;
 
-    // Define a posição inicial do golpe com base na posição do jogador
-    punch.style.left = playerRect.right - gameRect.left + 'px';
-    punch.style.top = playerRect.top - gameRect.top + 'px';
+function createDamageBox(player, key) {
+    let box;
 
-    // Define um timeout para iniciar a animação do golpe
-    setTimeout(() => {
-        // Define a transição da animação para aumentar a largura e altura do golpe
-        punch.style.transition = 'width 0.5s ease-out, height 0.5s ease-out';
-        punch.style.width = '50px';
-        punch.style.height = '50px';
+    function showDamageBox() {
+        box = document.createElement('div');
+        box.classList.add('damage-box');
+        game.appendChild(box);
+        updateBoxPosition();
+    }
 
-        // Inicia um intervalo para mover o golpe na direção especificada
-        let moveInterval = setInterval(() => {
-            // Obtém a posição atual do golpe
-            let currentLeft = parseInt(punch.style.left);
-            // Move o golpe para a direita ou esquerda com base na direção
-            punch.style.left = direction === 'right' ? currentLeft + 5 + 'px' : currentLeft - 5 + 'px';
+    function updateBoxPosition() {
+        const playerRect = player.getBoundingClientRect();
+        const gameRect = game.getBoundingClientRect();
+        box.style.left = playerRect.left - gameRect.left + 35 + 'px'; // Position 35px to the right of the player
+        box.style.top = playerRect.top - gameRect.top + (playerRect.height / 2 - 10) + 'px';
+    }
 
-            // Verifica se o golpe colidiu com as paredes do jogo ou com outro jogador
-            if (currentLeft > gameRect.width || currentLeft < 0) {
-                // Se colidiu, limpa o intervalo e remove o golpe
-                clearInterval(moveInterval);
-                punch.remove();
+    // Update the position of the box at a regular interval
+    const positionUpdateInterval = setInterval(() => {
+        if (box) {
+            updateBoxPosition();
+        }
+    }, 20);
+
+    let pressStartTime;
+
+    document.addEventListener('keydown', function onKeyPress(event) {
+        if (event.key === key && !box) {
+            pressStartTime = Date.now();
+            showDamageBox();
+        }
+    });
+
+    document.addEventListener('keyup', function onKeyRelease(event) {
+        if (event.key === key) {
+            const pressDuration = (Date.now() - pressStartTime) / 1000; // Convert to seconds
+
+            let damage;
+            if (pressDuration >= 0.20 && pressDuration <= 0.50) {
+                damage = increasedDamage;
+                box.style.background = 'black';
             } else {
-                // Se não colidiu, verifica colisão com os jogadores
-                checkCollision(punch, player1, player2, true);
+                damage = initialDamage;
+                box.style.background = 'cyan';
             }
-        }, 20);
-    }, 500);
+
+            // Remove the damage box after 1 second
+            setTimeout(() => {
+                const boxRect = box.getBoundingClientRect();
+                const player2Rect = player2.getBoundingClientRect();
+
+                if (isColliding(boxRect, player2Rect)) {
+                    applyDamage(player, damage);
+                }
+
+                if (box) {
+                    game.removeChild(box);
+                    box = null;
+                }
+            }, 500);
+
+            clearInterval(positionUpdateInterval);
+        }
+    });
 }
+
+function applyDamage(player, damage) {
+    if (player === player1) {
+        player2Health -= damage;
+        updateHealth(health2, lostHealth2, player2Health);
+    } else if (player === player2) {
+        player1Health -= damage;
+        updateHealth(health1, lostHealth1, player1Health);
+    }
+}
+
+function updateHealth(healthElement, lostHealthElement, health) {
+    healthElement.style.width = health + '%';
+    lostHealthElement.style.width = (100 - health) + '%';
+}
+
+function isColliding(rect1, rect2) {
+    return !(
+        rect1.right < rect2.left || 
+        rect1.left > rect2.right || 
+        rect1.bottom < rect2.top || 
+        rect1.top > rect2.bottom
+    );
+}
+
+// Use a tecla 'A' para testar
+createDamageBox(player1, 'g');
 
 // colisao de playes
 function checkCollision(projectile, player1, player2, isUltimate) {
