@@ -10,7 +10,7 @@ const ultimate2 = document.getElementById('ultimate2').querySelector('.ultimate'
 const specialElement = document.getElementById('special2').querySelector('.special');
 
 let pachinko = 0;
-let player1Health = 20;
+let player1Health = 10;
 let player2Health = 10;
 let player1Ultimate = 0;
 let player2Ultimate = 0;
@@ -22,7 +22,7 @@ let backgroundColorChanged = false;
 const pachinkoFullCharge = 20;
 const pachinkoChargeSpeed = 1;
 const playerSpeed = 15;
-const ultimateChargeSpeed = 10;
+const ultimateChargeSpeed = 1;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
 const portas = 1000;
@@ -558,8 +558,8 @@ function launchPurpleProjectile(player, direction) {
 
 // JACKPOT
 function roletaDeNumeros() {
-    if (player2Ultimate >= 30) { // Verifica se há pelo menos 10% de ultimate disponível
-        player2Ultimate -=30; // Consome 10% da ultimate do player2
+    if (player2Ultimate >= 15) { // Verifica se há pelo menos 10% de ultimate disponível
+        player2Ultimate -=15; // Consome 10% da ultimate do player2
     } else {
         showMessage("nao pode usar a roleta."); // Mensagem de aviso se não houver ultimate suficiente
         return; // Retorna sem executar o resto da função se não houver ultimate suficiente
@@ -587,13 +587,13 @@ function roletaDeNumeros() {
         showMessage(` ${numero1}, ${numero2}, ${numero3} `);  
         jackpot();
         changeBackgroundImage('https://i.pinimg.com/originals/d7/4b/67/d74b6737ae912d33bba82f3a4dcc4a30.gif', 'ds');
-        playAudio('tuca.mp3');
+        playAudio('sounds/tuca.mp3');
     }
     if (7 === numero1 === numero2 && numero2 === numero3) {
         showMessage(` ${numero1}, ${numero2}, ${numero3} `);  
         jackpot();
         changeBackgroundImage('https://i.pinimg.com/originals/d7/4b/67/d74b6737ae912d33bba82f3a4dcc4a30.gif', 'ds');
-        playAudio('tuca.mp3');
+        playAudio('sounds/tuca.mp3');
     }
 }
 function jackpot() {
@@ -604,6 +604,7 @@ function jackpot() {
             if (player2Health < 10) {
                 player2Health++;
                 updateHealth(health2, lostHealth2, player2Health);
+                
             }
             timeElapsed += 0.3; // Incrementa o tempo em 0.3 segundos (300ms)
         } else {
