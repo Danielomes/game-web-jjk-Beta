@@ -40,7 +40,7 @@ body {
 }
 
 #player2 {
-    background-color: blue;
+    background-image: blue;
     right: 50px;
     bottom: 50px;
 }

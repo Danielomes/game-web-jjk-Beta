@@ -39,9 +39,8 @@ const cooldownDurations = {
     '7': 2000, // Nova tecla 7
     '8': 1000, // Nova tecla 8
     '4': 1000, // Lançar bola para Player 1
-
-
 };
+
 // Cooldown status
 const cooldownStatus = {
     'q': false,
@@ -55,6 +54,14 @@ const cooldownStatus = {
     '7': false,
     '8': false,
 };
+document.addEventListener('keyup', (event) => {
+    if (event.key === 'g') {
+        endTime = new Date();
+        const pressDuration = (endTime - startTime) / 1000; // Tempo em segundos
+        showMessage(`Tecla G pressionada por ${pressDuration} segundos`);
+        punhoDivergente(pressDuration); // Chamando a função punhoDivergente com a duração da pressão da tecla
+    }
+});
 
 // Função para exibir uma mensagem na tela
 function showMessage(message) {
@@ -68,7 +75,7 @@ function showMessage(message) {
     game.appendChild(messageElement);
     setTimeout(() => {
         messageElement.remove();
-    }, 2000); // Remover mensagem após 2 segundos
+    }, 7000); // Remover mensagem após 7 segundos
 }
 let player2ControlsEnabled = false; // Variável para controlar o estado dos controles do player 2
 
@@ -89,36 +96,6 @@ document.getElementById('addCharacter').addEventListener('click', () => {
 document.addEventListener('keydown', (event) => {
     if (player1Paralyzed && ['w', 'a', 's', 'd'].includes(event.key)) return;
     if (cooldownStatus[event.key]) return; // If the key is on cooldown, return
-
-    switch (event.key) {
-        // Controles do Jogador 1 (WASD)
-        case 'w':
-          
-            break;
-        case 'a':
-          
-            break;
-        case 's':
-           
-            break;
-        case 'd':
-           
-            break;
-
-        // Controles do Jogador 2 (Setas direcionais) - Verifique se os controles do player 2 estão ativados
-        case 'ArrowUp':
-        case 'ArrowLeft':
-        case 'ArrowDown':
-        case 'ArrowRight':
-        case 'm':
-        case 'n':
-        case 'b':
-        case '7':
-        case '8':
-        case '9':
-            if (!player2ControlsEnabled) return; // Retorna se os controles do player 2 não estão ativados
-            break;
-    }
 
     switch (event.key) {
         // Controles do Jogador 1 (WASD)
@@ -154,6 +131,7 @@ document.addEventListener('keydown', (event) => {
             if (player1UltimateActive) {
                 launchUltimateRectangle(player1, 'right');
                 showMessage('fuga');
+                open('sounds/som-de-fogo-fire-sound-effect-efeito-sonoro-112953.mp3');
             } else {
                 shootBall(player1, 'right', false);
                 showMessage('');
@@ -178,6 +156,7 @@ document.addEventListener('keydown', (event) => {
                 player1Ultimate = 0;
                 updateUltimate(ultimate1, player1Ultimate);
                 showMessage('Rei das maldições');
+                open('sounds/laught.mp3');
             }
             break;
         case 'n':
@@ -197,32 +176,33 @@ document.addEventListener('keydown', (event) => {
             break;
         case '9':
             meleeAttack(player2, player1, false);
-        break;
-        
+            break;
 
         // Habilidade especial de mudança de fundo ou barra horizontal
         case 't':
-            if (!backgroundColorChanged && player1UltimateActive) {
-                changeBackgroundImage('https://wallpapercave.com/wp/wp10302006.png', 'ds');
+            if (!backgroundColorChanged && player1UltimateActive) {  
+                fukumamizushi('https://wallpapercave.com/wp/wp10302006.png', 'ds');
                 dealDamage(player2, 5);
                 player1UltimateActive = false;
                 triggerCooldown('t'); // Trigger cooldown for 't'
                 showMessage('fukuma mizushi');
-                fukuma('dominsukuna.mp3')
+                fukuma('sounds/dominsukuna.mp3');
+                fukumas('sounds/ryokitenkaisukuna.mp3');
             } else if (!player1UltimateActive && player1Ultimate >= ultimateFullCharge / 2) {
                 launchHalfMapAttack(player1, 'down');
                 triggerCooldown('t'); // Trigger cooldown for 't'
                 showMessage('scale of the dragon recoil twin meteors');
+                fukumas('sounds/anime-slash-sound-effect-made-with-Voicemod.mp3');
             } else if (!player1UltimateActive) {
                 launchHorizontalBar(player1);
                 triggerCooldown('t'); // Trigger cooldown for 't'
                 showMessage('dismantle');
+                fukumas('sounds/anime-slash-sound-effect-made-with-Voicemod.mp3');
             }
-            
             break;
         case 'b':
             if (!backgroundColorChanged && player2UltimateActive) {
-                fukumamizushi('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Six eyes');
+                changeBackgroundImage('https://i.pinimg.com/736x/25/1f/49/251f49b9061e3ef0b3a862135258f151.jpg', 'Six eyes');
                 paralyzePlayer(player1, paralysisDuration);
                 player2UltimateActive = false;
                 triggerCooldown('b'); // Trigger cooldown for 'b'
@@ -243,22 +223,21 @@ document.addEventListener('keydown', (event) => {
             doors();
             triggerCooldown('8'); // Trigger cooldown for '8'
             break;
-        case '4':          
-                shootBall(player2, 'left', false);
-                showMessage('');      
+        case '4':
+            shootBall(player2, 'left', false);
+            showMessage('');
             triggerCooldown('4'); // Trigger cooldown for 'q'
             break;
 
-
-            case 'f':          
-            switchPlayerPositions()
-            showMessage('');      
-      
-        break;
-        case 'g': 
-        punhodivergente('')
-        showMessage('');
-        break
+        case 'f':
+            switchPlayerPositions();
+            showMessage('');
+            fukumas('sounds/clap.mp3');
+            break;
+        case 'g':
+            punhodivergente('');
+            showMessage('');
+            break;
           
     }
 });
@@ -628,6 +607,30 @@ function fukuma(audioFile) {
         audio.currentTime = 0; // Reinicia para o início do áudio
     }, 15000); // 30000 milissegundos = 30 segundos
 }
+function fukumas(audioFile) {
+    const audio = new Audio(audioFile);
+    audio.volume = 1;
+    audio.play();
+
+    // Parar o áudio após 30 segundos
+    setTimeout(() => {
+        audio.pause();
+        audio.currentTime = 0; // Reinicia para o início do áudio
+    }, 15000); // 30000 milissegundos = 30 segundos
+}
+function open(audioFile) {
+    const audio = new Audio(audioFile);
+    audio.volume = 1;
+    audio.currentTime = 2.2;
+    audio.play();
+
+    // Parar o áudio após 30 segundos
+    setTimeout(() => {
+        audio.pause();
+        audio.currentTime = 0; // Reinicia para o início do áudio
+    }, 4000); // 30000 milissegundos = 30 segundos
+}
+
 
 
 // ataque de fechar de portas
@@ -871,7 +874,7 @@ function fukumamizushi(imageUrl) {
     setTimeout(() => {
         game.style.backgroundImage = originalBackgroundImage;
         backgroundColorChanged = false;
-    }, 60000);
+    }, 15000);
 }
 
 // soco
