@@ -22,7 +22,7 @@ let backgroundColorChanged = false;
 const pachinkoFullCharge = 20;
 const pachinkoChargeSpeed = 1;
 const playerSpeed = 15;
-const ultimateChargeSpeed = 100;
+const ultimateChargeSpeed = 10;
 const ultimateFullCharge = 100;
 const paralysisDuration = 6000; // 6 seconds
 const portas = 1000;
@@ -39,6 +39,8 @@ const cooldownDurations = {
     '7': 2000, // Nova tecla 7
     '8': 1000, // Nova tecla 8
     '4': 1000, // Lançar bola para Player 1
+    'h': 1500
+   
 };
 
 // Cooldown status
@@ -53,6 +55,7 @@ const cooldownStatus = {
     'b': false,
     '7': false,
     '8': false,
+    'h': false
 };
 
 
@@ -84,26 +87,48 @@ document.getElementById('addCharacter').addEventListener('click', () => {
     // Aqui você pode adicionar mais lógica para configurar o novo personagem
     player2ControlsEnabled = true; // Ativar os controles do player 2
 });
-
+let keysPressed = {};
+let dashEnabled = false; // Flag to control dash availability
 // comandos
 document.addEventListener('keydown', (event) => {
+ 
+    keysPressed[event.key] = true;
+
     if (player1Paralyzed && ['w', 'a', 's', 'd'].includes(event.key)) return;
     if (cooldownStatus[event.key]) return; // If the key is on cooldown, return
 
     switch (event.key) {
         // Controles do Jogador 1 (WASD)
         case 'w':
-            movePlayer(player1, 0, -playerSpeed);
+            if (keysPressed['h'] && dashEnabled) {
+                dashPlayer('up');
+            } else {
+                movePlayer(player1, 0, -playerSpeed);
+            }
             break;
         case 'a':
-            movePlayer(player1, -playerSpeed, 0);
+            if (keysPressed['h'] && dashEnabled) {
+                dashPlayer('left');
+            } else {
+                movePlayer(player1, -playerSpeed, 0);
+            }
             break;
         case 's':
-            movePlayer(player1, 0, playerSpeed);
+            if (keysPressed['h'] && dashEnabled) {
+                dashPlayer('down');
+            } else {
+                movePlayer(player1, 0, playerSpeed);
+            }
             break;
         case 'd':
-            movePlayer(player1, playerSpeed, 0);
+            if (keysPressed['h'] && dashEnabled) {
+                dashPlayer('right');
+            } else {
+                movePlayer(player1, playerSpeed, 0);
+            }
             break;
+
+
 
         // Controles do Jogador 2 (Setas direcionais)
         case 'ArrowUp':
@@ -227,10 +252,20 @@ document.addEventListener('keydown', (event) => {
             showMessage('');
             fukumas('sounds/clap.mp3');
             break;
-        case 'g':
-            punhodivergente('');
-            showMessage('');
-            break;
+
+        case 'h':
+        fukumas('sounds/clap.mp3');
+                if (keysPressed['d']) {
+                    dashPlayer('right');
+                } else if (keysPressed['a']) {
+                    dashPlayer('left');
+                } else if (keysPressed['w']) {
+                    dashPlayer('up');
+                } else if (keysPressed['s']) {
+                    dashPlayer('down');
+                }
+        triggerCooldown('h');
+                break;
           
     }
 });
@@ -754,6 +789,8 @@ function createDamageBox(player, key) {
     });
 }
 
+
+
 function applyDamage(player, damage) {
     if (player === player1) {
         player2Health -= damage;
@@ -780,6 +817,43 @@ function isColliding(rect1, rect2) {
 
 // Use a tecla 'A' para testar
 createDamageBox(player1, 'g');
+
+// clap dash
+document.addEventListener('keyup', (event) => {
+    delete keysPressed[event.key];
+    if (event.key === 'h') {
+        dashEnabled = false; // Disable dash when 'h' is released
+    }
+});
+function dashPlayer(direction) {
+    const playerRect = player1.getBoundingClientRect();
+    const gameRect = game.getBoundingClientRect();
+
+    switch (direction) {
+        case 'right':
+            player1.style.left = Math.min(gameRect.width - playerRect.width, playerRect.left - gameRect.left + 200) + 'px';
+            break;
+        case 'left':
+            player1.style.left = Math.max(0, playerRect.left - gameRect.left - 200) + 'px';
+            break;
+        case 'up':
+            player1.style.top = Math.max(0, playerRect.top - gameRect.top - 200) + 'px';
+            break;
+        case 'down':
+            player1.style.top = Math.min(gameRect.height - playerRect.height, playerRect.top - gameRect.top + 200) + 'px';
+            break;
+    }
+
+    
+    dashEnabled = false; // Disable dash after use
+}
+// arremeso de pedra
+
+
+
+
+
+// final dos codigos de ataques
 
 // colisao de playes
 function checkCollision(projectile, player1, player2, isUltimate) {
