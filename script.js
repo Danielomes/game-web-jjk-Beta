@@ -77,6 +77,7 @@ let player2ControlsEnabled = false; // Variável para controlar o estado dos con
 
 document.getElementById('play2').addEventListener('click', () => {
     player2ControlsEnabled = true; // Ativar os controles do player 2
+    judas('sounds/Judas.mp3')
 });
 
 // HAKARI
@@ -658,6 +659,17 @@ function open(audioFile) {
         audio.pause();
         audio.currentTime = 0; // Reinicia para o início do áudio
     }, 4000); // 30000 milissegundos = 30 segundos
+}
+function judas(audioFile) {
+    const audio = new Audio(audioFile);
+    audio.volume = 0.5;
+    audio.play();
+
+    // Parar o áudio após 30 segundos
+    setTimeout(() => {
+        audio.pause();
+        audio.currentTime = 0; // Reinicia para o início do áudio
+    }, 540000); // 30000 milissegundos = 30 segundos
 }
 
 
