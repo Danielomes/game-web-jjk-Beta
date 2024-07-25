@@ -40,7 +40,6 @@ const cooldownDurations = {
     '8': 1000, // Nova tecla 8
     '4': 1000, // Lançar bola para Player 1
     'h': 1500
-   
 };
 
 // Cooldown status
@@ -58,6 +57,8 @@ const cooldownStatus = {
     'h': false
 };
 
+// Estado inicial: todas as teclas desativadas
+let allowedKeys = {};
 
 // Função para exibir uma mensagem na tela
 function showMessage(message) {
@@ -73,26 +74,75 @@ function showMessage(message) {
         messageElement.remove();
     }, 7000); // Remover mensagem após 7 segundos
 }
-let player2ControlsEnabled = false; // Variável para controlar o estado dos controles do player 2
 
-document.getElementById('play2').addEventListener('click', () => {
-    player2ControlsEnabled = true; // Ativar os controles do player 2
-    judas('sounds/Judas.mp3')
-});
-
-// HAKARI
-
-document.getElementById('addCharacter').addEventListener('click', () => {
-    const player2 = document.getElementById('player2');
-    player2.style.backgroundColor = 'green'; // Substitui o player2 com um novo personagem
-    // Aqui você pode adicionar mais lógica para configurar o novo personagem
-    player2ControlsEnabled = true; // Ativar os controles do player 2
-});
 let keysPressed = {};
 let dashEnabled = false; // Flag to control dash availability
+
+// Função para ativar teclas permitidas
+function enableKeys(keys) {
+    keys.forEach(key => {
+        allowedKeys[key] = true;
+    });
+}
+
+
+// Lista de personagens selecionados
+let selectedCharacters = [];
+
+
+
+// Função para selecionar um personagem
+function selectCharacter(character, keys) {
+    if (selectedCharacters.includes(character)) return;
+    if (selectedCharacters.length >= 2) return;
+
+    enableKeys(keys);
+    selectedCharacters.push(character);
+
+    if (selectedCharacters.includes('sukuna') && selectedCharacters.includes('play2')) {
+        judas('sounds/Judas.mp3');
+    }
+
+    if (selectedCharacters.length >= 2) {
+        hideButtons();
+    }
+}
+
+function hideButtons() {
+    document.getElementById('itadori').style.display = 'none';
+    document.getElementById('sukuna').style.display = 'none';
+    document.getElementById('play2').style.display = 'none';
+    document.getElementById('addCharacter').style.display = 'none';
+}
+
+// Event listener para Itadori
+document.getElementById('itadori').addEventListener('click', () => {
+    selectCharacter('itadori', ['w', 'a', 's', 'd', 'q', 'f', 'g', 'h']);
+
+});
+
+// Event listener para Sukuna
+document.getElementById('sukuna').addEventListener('click', () => {
+    selectCharacter('sukuna', ['w', 'a', 's', 'd', 'q', 'e', 'r', 't']);
+    
+});
+
+// Event listener para Gojo
+document.getElementById('play2').addEventListener('click', () => {
+    selectCharacter('play2', ['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', ',', 'm', 'n', 'b']);
+
+});
+
+// Event listener para Hakari
+document.getElementById('addCharacter').addEventListener('click', () => {
+    selectCharacter('hakari', ['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', '7', '8', '9', '4']);
+
+});
+
 // comandos
 document.addEventListener('keydown', (event) => {
- 
+    if (!allowedKeys[event.key]) return; // Ignorar teclas não permitidas
+
     keysPressed[event.key] = true;
 
     if (player1Paralyzed && ['w', 'a', 's', 'd'].includes(event.key)) return;
@@ -129,8 +179,6 @@ document.addEventListener('keydown', (event) => {
             }
             break;
 
-
-
         // Controles do Jogador 2 (Setas direcionais)
         case 'ArrowUp':
             movePlayer(player2, 0, -playerSpeed);
@@ -159,8 +207,9 @@ document.addEventListener('keydown', (event) => {
             break;
         case 'm':
             if (player2UltimateActive) {
-                launchPurpleProjectile(player2, 'left'); // Lançar projétil roxo
-                showMessage('Red');
+                launchPurpleProjectile(player2, 'left'); // Lança um projétil roxo para a esquerda
+                player2UltimateActive = false;
+                showMessage('muryo kusho');
             } else {
                 shootBall(player2, 'left', false);
                 showMessage('');
@@ -241,11 +290,13 @@ document.addEventListener('keydown', (event) => {
         case '8':
             doors();
             triggerCooldown('8'); // Trigger cooldown for '8'
+            judas('sounds/pipe.mp3')
             break;
         case '4':
             shootBall(player2, 'left', false);
             showMessage('');
             triggerCooldown('4'); // Trigger cooldown for 'q'
+          
             break;
 
         case 'f':
@@ -255,19 +306,18 @@ document.addEventListener('keydown', (event) => {
             break;
 
         case 'h':
-        fukumas('sounds/clap.mp3');
-                if (keysPressed['d']) {
-                    dashPlayer('right');
-                } else if (keysPressed['a']) {
-                    dashPlayer('left');
-                } else if (keysPressed['w']) {
-                    dashPlayer('up');
-                } else if (keysPressed['s']) {
-                    dashPlayer('down');
-                }
-        triggerCooldown('h');
-                break;
-          
+            fukumas('sounds/clap.mp3');
+            if (keysPressed['d']) {
+                dashPlayer('right');
+            } else if (keysPressed['a']) {
+                dashPlayer('left');
+            } else if (keysPressed['w']) {
+                dashPlayer('up');
+            } else if (keysPressed['s']) {
+                dashPlayer('down');
+            }
+            triggerCooldown('h');
+            break;
     }
 });
 
@@ -662,7 +712,7 @@ function open(audioFile) {
 }
 function judas(audioFile) {
     const audio = new Audio(audioFile);
-    audio.volume = 0.5;
+    audio.volume = 0.2;
     audio.play();
 
     // Parar o áudio após 30 segundos
@@ -777,6 +827,7 @@ function createDamageBox(player, key) {
             if (pressDuration >= 0.20 && pressDuration <= 0.50) {
                 damage = increasedDamage;
                 box.style.background = 'black';
+                fukumas('sounds/kokusen.mp3')
             } else {
                 damage = initialDamage;
                 box.style.background = 'cyan';
