@@ -99,15 +99,32 @@ function selectCharacter(character, keys) {
     enableKeys(keys);
     selectedCharacters.push(character);
 
+    // Desativar Itadori quando Sukuna for selecionado e vice-versa
+    if (character === 'sukuna') {
+        document.getElementById('itadori').disabled = true;
+    } else if (character === 'itadori') {
+        document.getElementById('sukuna').disabled = true;
+    }
+
+    // Desativar Gojo quando Hakari for selecionado e vice-versa
+    if (character === 'play2') {
+        document.getElementById('addCharacter').disabled = true;
+    } else if (character === 'hakari') {
+        document.getElementById('play2').disabled = true;
+    }
+
+    // Condição para tocar som de Judas
     if (selectedCharacters.includes('sukuna') && selectedCharacters.includes('play2')) {
         judas('sounds/Judas.mp3');
     }
 
+    // Esconder os botões quando dois personagens forem selecionados
     if (selectedCharacters.length >= 2) {
         hideButtons();
     }
 }
 
+// Função para esconder botões
 function hideButtons() {
     document.getElementById('itadori').style.display = 'none';
     document.getElementById('sukuna').style.display = 'none';
@@ -118,25 +135,21 @@ function hideButtons() {
 // Event listener para Itadori
 document.getElementById('itadori').addEventListener('click', () => {
     selectCharacter('itadori', ['w', 'a', 's', 'd', 'q', 'f', 'g', 'h']);
-
 });
 
 // Event listener para Sukuna
 document.getElementById('sukuna').addEventListener('click', () => {
     selectCharacter('sukuna', ['w', 'a', 's', 'd', 'q', 'e', 'r', 't']);
-    
 });
 
 // Event listener para Gojo
 document.getElementById('play2').addEventListener('click', () => {
     selectCharacter('play2', ['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', ',', 'm', 'n', 'b']);
-
 });
 
 // Event listener para Hakari
 document.getElementById('addCharacter').addEventListener('click', () => {
     selectCharacter('hakari', ['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', '7', '8', '9', '4']);
-
 });
 
 // comandos
@@ -1097,5 +1110,6 @@ function resetGame() {
     player2.style.right = '100px';
     player2.style.bottom = '50px';
 }
+
 
 setInterval(chargeUltimate, 1000);

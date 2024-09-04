@@ -213,3 +213,128 @@ h1 {
     position: absolute;
     background-color: cyan;
 }
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Muito alto para ficar na frente de tudo */
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 100%;
+    height: 100%;
+}
+
+.grid-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    border: none;
+    background-color: #333;
+    color: white;
+    text-align: center;
+    font-family: 'Jujutsu Kaisen', sans-serif;
+    position: relative;
+    cursor: pointer;
+    z-index: 10001; /* Para garantir que os botões estejam acima do fundo da splash */
+    
+}
+
+.grid-button::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    z-index: -1; /* Para manter a imagem de fundo do botão atrás do botão */
+}   
+
+
+#itadori {
+    position: relative; /* Necessário para o posicionamento da pseudo-classe */
+    overflow: hidden; /* Garante que a imagem não saia do botão */
+    color: white; /* Ajusta a cor do texto para contraste */
+   
+}
+
+
+#itadori::before {
+    content: '';
+
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(https://steamuserimages-a.akamaihd.net/ugc/2307595172322016881/A36F6EADF2EEFB2D26F772EA3D2E0E25F291BA25/?imw=637&imh=358&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.5; /* Ajuste a opacidade conforme necessário (0.0 a 1.0) */
+    z-index: -1; /* Coloca a imagem atrás do conteúdo do botão */
+}
+#play2 {
+    position: relative; /* Necessário para o posicionamento da pseudo-classe */
+    overflow: hidden; /* Garante que a imagem não saia do botão */
+    color: white; /* Ajusta a cor do texto para contraste */
+}
+
+#play2::before {
+    content: '';
+  
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(https://criticalhits.com.br/wp-content/uploads/2022/01/gojo-910x512.jpg);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.5; /* Ajuste a opacidade conforme necessário (0.0 a 1.0) */
+    z-index: -1; /* Coloca a imagem atrás do conteúdo do botão */
+}
+#addCharacter {
+    position: relative; /* Necessário para o posicionamento da pseudo-classe */
+    overflow: hidden; /* Garante que a imagem não saia do botão */
+    color: white; /* Ajusta a cor do texto para contraste */
+}
+
+#addCharacter::before {
+    content: '';
+  
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(https://i.pinimg.com/originals/26/0d/8b/260d8b580b86825ec08795fa28cd8b82.jpg);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.5; /* Ajuste a opacidade conforme necessário (0.0 a 1.0) */
+    z-index: -1; /* Coloca a imagem atrás do conteúdo do botão */
+}
+#sukuna {
+    position: relative; /* Necessário para o posicionamento da pseudo-classe */
+    overflow: hidden; /* Garante que a imagem não saia do botão */
+    color: white; /* Ajusta a cor do texto para contraste */
+}
+
+#sukuna::before {
+    content: '';
+  
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(https://criticalhits.com.br/wp-content/uploads/2021/06/Sukuna_popularidade.jpg);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.5; /* Ajuste a opacidade conforme necessário (0.0 a 1.0) */
+    z-index: -1; /* Coloca a imagem atrás do conteúdo do botão */
+}
